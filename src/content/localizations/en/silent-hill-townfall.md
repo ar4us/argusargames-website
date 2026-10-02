@@ -5,7 +5,7 @@ cover: "/images/covers/silent-hill-townfall.jpg"
 version: "v1.0.0"
 status: "complete"
 download_url: "https://files.argusargames.com/%D8%AA%D8%B9%D8%B1%D9%8A%D8%A8%20%D9%84%D8%B9%D8%A8%D8%A9%20Silent%20Hill%20Townfall.rar"
-file_size: "RAR"
+file_size: "113.65 MB"
 release_date: 2026-10-01
 platforms: ["PC"]
 description: "A complete Arabic localization for Silent Hill: Townfall, covering all dialogue, story, and UI while preserving the game's psychological horror atmosphere."
