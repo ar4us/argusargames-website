@@ -4,7 +4,7 @@ game: "Silent Hill: Townfall"
 cover: "/images/covers/silent-hill-townfall.jpg"
 version: "v1.0.0"
 status: "complete"
-download_url: "https://files.argusargames.com/townfall-arabic-v1.0.rar"
+download_url: "https://files.argusargames.com/S-H-Townfall-Ar.rar"
 file_size: "113.65 MB"
 release_date: 2026-10-01
 platforms: ["PC"]
