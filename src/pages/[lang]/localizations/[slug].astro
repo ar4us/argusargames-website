@@ -1,0 +1,172 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { getLangFromUrl, useTranslations } from "../../../i18n/ui";
+import { getCollection, render } from "astro:content";
+
+export async function getStaticPaths() {
+  const allGames = await getCollection("localizations");
+  return allGames.map((game) => {
+    // id format: "ar/silent-hill-townfall"
+    const [lang, ...slugParts] = game.id.split("/");
+    return {
+      params: { lang, slug: slugParts.join("/") },
+      props: { game },
+    };
+  });
+}
+
+const { game } = Astro.props;
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const {
+  title,
+  game: gameName,
+  cover,
+  version,
+  status,
+  download_url,
+  file_size,
+  release_date,
+  description,
+  screenshots,
+  install_guide,
+  platforms,
+} = game.data;
+
+const { Content } = await render(game);
+
+const statusColors = {
+  complete: "bg-green-500/10 text-green-400 border-green-500/30",
+  beta: "bg-amber-500/10 text-amber-400 border-amber-500/30",
+  partial: "bg-blue-500/10 text-blue-400 border-blue-500/30",
+};
+
+const statusLabels = {
+  complete: t("games.status.complete"),
+  beta: t("games.status.beta"),
+  partial: t("games.status.partial"),
+};
+
+const formattedDate = release_date.toLocaleDateString(
+  lang === "ar" ? "ar-MA" : "en-US",
+  { year: "numeric", month: "long", day: "numeric" }
+);
+---
+
+<BaseLayout title={title} description={description} ogImage={cover}>
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+    <!-- Back link -->
+    <a
+      href={`/${lang}/localizations/`}
+      class="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-[#00d4ff] transition-colors mb-8"
+    >
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="flip-rtl">
+        <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+      </svg>
+      {t("nav.localizations")}
+    </a>
+
+    <!-- Hero Row -->
+    <div class="flex flex-col lg:flex-row gap-8 mb-12">
+
+      <!-- Cover -->
+      <div class="lg:w-2/5">
+        <div class="rounded-2xl overflow-hidden border border-[#1e1e2e] aspect-[16/9]">
+          <img src={cover} alt={gameName} class="w-full h-full object-cover" />
+        </div>
+      </div>
+
+      <!-- Info -->
+      <div class="lg:w-3/5 flex flex-col justify-center">
+        <div class="flex items-center gap-3 mb-4">
+          <span class={`text-xs font-semibold px-3 py-1 rounded-full border ${statusColors[status]}`}>
+            {statusLabels[status]}
+          </span>
+        </div>
+
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-white mb-2" style="font-family: Cairo, sans-serif;">
+          {title}
+        </h1>
+        <p class="text-slate-400 text-sm mb-6">{gameName}</p>
+
+        {description && (
+          <p class="text-slate-300 text-sm leading-relaxed mb-6">{description}</p>
+        )}
+
+        <!-- Meta grid -->
+        <div class="grid grid-cols-2 gap-3 mb-8">
+          {[
+            { label: t("games.version"), value: version },
+            { label: t("games.size"), value: file_size },
+            { label: t("games.platforms"), value: platforms.join(", ") },
+            { label: t("games.released"), value: formattedDate },
+          ].map(({ label, value }) => (
+            <div class="bg-[#12121a] rounded-lg p-3 border border-[#1e1e2e]">
+              <div class="text-xs text-slate-500 mb-1">{label}</div>
+              <div class="text-sm font-semibold text-white">{value}</div>
+            </div>
+          ))}
+        </div>
+
+        <!-- Download Button -->
+        <a
+          href={download_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl bg-gradient-to-r from-[#00d4ff] to-[#0066ff] text-white font-bold text-base hover:opacity-90 transition-all glow-cyan hover:scale-[1.02] w-full sm:w-auto"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 16l-5-5 1.41-1.41L11 13.17V4h2v9.17l2.59-2.58L17 11l-5 5zm-7 4v-2h14v2H5z"/>
+          </svg>
+          {t("games.download")} — {file_size}
+        </a>
+      </div>
+    </div>
+
+    <!-- Screenshots -->
+    {screenshots && screenshots.length > 0 && (
+      <section class="mb-12">
+        <h2 class="text-xl font-bold text-white mb-4" style="font-family: Cairo, sans-serif;">
+          {lang === "ar" ? "لقطات من اللعبة" : "Screenshots"}
+          <span class="block w-12 h-0.5 bg-[#00d4ff] mt-2 rounded-full"></span>
+        </h2>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          {screenshots.map((src: string, i: number) => (
+            <a href={src} target="_blank" rel="noopener">
+              <img
+                src={src}
+                alt={`${gameName} screenshot ${i + 1}`}
+                class="rounded-lg border border-[#1e1e2e] hover:border-[#00d4ff]/50 transition-all object-cover aspect-video w-full"
+                loading="lazy"
+              />
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <!-- Install Guide -->
+    {install_guide && (
+      <section class="mb-12">
+        <h2 class="text-xl font-bold text-white mb-4" style="font-family: Cairo, sans-serif;">
+          {t("games.install")}
+          <span class="block w-12 h-0.5 bg-[#f5c518] mt-2 rounded-full"></span>
+        </h2>
+        <div class="bg-[#12121a] rounded-xl border border-[#1e1e2e] p-6">
+          <p class="text-slate-300 text-sm leading-relaxed whitespace-pre-line">{install_guide}</p>
+        </div>
+      </section>
+    )}
+
+    <!-- Markdown Content -->
+    <div class="prose prose-invert prose-sm max-w-none
+      prose-headings:text-white prose-headings:font-bold
+      prose-p:text-slate-300 prose-li:text-slate-300
+      prose-strong:text-white prose-a:text-[#00d4ff]">
+      <Content />
+    </div>
+
+  </div>
+</BaseLayout>

@@ -1,0 +1,60 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getLangFromUrl, useTranslations } from "../../i18n/ui";
+
+export function getStaticPaths() {
+  return [{ params: { lang: "ar" } }, { params: { lang: "en" } }];
+}
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<BaseLayout title={t("nav.about")}>
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+
+    <h1 class="text-3xl font-extrabold text-white mb-3" style="font-family: Cairo, sans-serif;">
+      {t("nav.about")}
+      <span class="block w-16 h-1 bg-gradient-to-r from-[#00d4ff] to-transparent mt-3 rounded-full"></span>
+    </h1>
+
+    <div class="space-y-6 text-slate-300 leading-relaxed mt-8">
+      {lang === "ar" ? (
+        <>
+          <p class="text-lg">
+            مرحباً بك في <strong class="text-[#00d4ff]">بالعربي Games</strong> — مشروع شخصي هدفه تعريب الألعاب التي لا تدعم اللغة العربية رسمياً.
+          </p>
+          <p>
+            كل تعريب يمر بعملية دقيقة تشمل ترجمة الحوارات والقصص والواجهات، مع الحفاظ على الأجواء والشخصيات كما أرادها المطورون.
+          </p>
+          <p>
+            جميع التعريبات <strong class="text-white">مجانية تماماً</strong>، ولا تُستخدم لأي أغراض تجارية.
+          </p>
+          <div class="bg-[#12121a] rounded-xl border border-[#1e1e2e] p-6 mt-8">
+            <p class="text-sm text-slate-500">
+              ⚠️ هذا الموقع غير رسمي وغير مرتبط بأي ناشر أو مطور. التعريبات مقدمة لأغراض شخصية وتعليمية فقط.
+            </p>
+          </div>
+        </>
+      ) : (
+        <>
+          <p class="text-lg">
+            Welcome to <strong class="text-[#00d4ff]">بالعربي Games</strong> — a personal project dedicated to localizing games that don't officially support Arabic.
+          </p>
+          <p>
+            Each localization goes through a careful process covering dialogue, story, and UI — preserving the atmosphere and characters as the developers intended.
+          </p>
+          <p>
+            All localizations are <strong class="text-white">completely free</strong> and not used for any commercial purposes.
+          </p>
+          <div class="bg-[#12121a] rounded-xl border border-[#1e1e2e] p-6 mt-8">
+            <p class="text-sm text-slate-500">
+              ⚠️ This is an unofficial site, unaffiliated with any publisher or developer. Patches are provided for personal and educational use only.
+            </p>
+          </div>
+        </>
+      )}
+    </div>
+
+  </div>
+</BaseLayout>

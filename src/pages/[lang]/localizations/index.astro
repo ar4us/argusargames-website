@@ -1,0 +1,56 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import GameCard from "../../../components/GameCard.astro";
+import { getLangFromUrl, useTranslations } from "../../../i18n/ui";
+import { getCollection } from "astro:content";
+
+export function getStaticPaths() {
+  return [{ params: { lang: "ar" } }, { params: { lang: "en" } }];
+}
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const allGames = await getCollection("localizations", ({ id }) =>
+  id.startsWith(`${lang}/`)
+);
+
+const games = allGames.sort(
+  (a, b) => b.data.release_date.getTime() - a.data.release_date.getTime()
+);
+---
+
+<BaseLayout title={t("nav.localizations")}>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+
+    <!-- Page Header -->
+    <div class="mb-12">
+      <h1 class="text-3xl sm:text-4xl font-extrabold text-white mb-3" style="font-family: Cairo, sans-serif;">
+        {t("nav.localizations")}
+        <span class="block w-20 h-1 bg-gradient-to-r from-[#00d4ff] to-transparent mt-3 rounded-full"></span>
+      </h1>
+      <p class="text-slate-400">
+        {lang === "ar"
+          ? `${games.length} تعريب متاح للتحميل المجاني`
+          : `${games.length} localization(s) available for free download`}
+      </p>
+    </div>
+
+    <!-- Games Grid -->
+    {games.length === 0 ? (
+      <div class="text-center py-32 text-slate-500">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="currentColor" class="mx-auto mb-4 opacity-30">
+          <path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5S14.67 12 15.5 12s1.5.67 1.5 1.5S16.33 15 15.5 15zm3-3c-.83 0-1.5-.67-1.5-1.5S17.67 9 18.5 9s1.5.67 1.5 1.5S19.33 12 18.5 12z"/>
+        </svg>
+        <p>{t("games.empty")}</p>
+      </div>
+    ) : (
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {games.map((game) => (
+          <GameCard game={game} lang={lang} />
+        ))}
+      </div>
+    )}
+
+  </div>
+</BaseLayout>

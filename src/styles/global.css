@@ -1,0 +1,149 @@
+@import "tailwindcss";
+@import "@fontsource/cairo/400.css";
+@import "@fontsource/cairo/600.css";
+@import "@fontsource/cairo/700.css";
+@import "@fontsource/cairo/800.css";
+@import "@fontsource/cairo/900.css";
+
+@theme {
+  --font-sans: "Cairo", ui-sans-serif, system-ui, sans-serif;
+
+  /* Primary palette */
+  --color-bg:        #070711;
+  --color-surface:   #0d0d1f;
+  --color-card:      #0f0f22;
+  --color-border:    #1a1a35;
+  --color-border-hover: #2d2d5e;
+
+  /* Accent */
+  --color-violet:    #7c5cfc;
+  --color-violet-dark: #5b3ee0;
+  --color-gold:      #f0b429;
+  --color-gold-dim:  #c48f1f;
+  --color-cyan:      #22d3ee;
+
+  /* Text */
+  --color-text-primary:   #f0f0ff;
+  --color-text-secondary: #8b8baf;
+  --color-text-muted:     #4a4a72;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--color-bg); }
+::-webkit-scrollbar-thumb { background: var(--color-border-hover); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-violet); }
+
+/* ── Noise texture overlay ── */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.4;
+}
+
+/* ── Grid line background ── */
+.grid-bg {
+  background-image:
+    linear-gradient(rgba(124, 92, 252, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(124, 92, 252, 0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* ── Glows ── */
+.glow-violet { box-shadow: 0 0 40px rgba(124, 92, 252, 0.25), 0 0 80px rgba(124, 92, 252, 0.1); }
+.glow-gold   { box-shadow: 0 0 30px rgba(240, 180, 41, 0.3); }
+.text-glow-violet { text-shadow: 0 0 30px rgba(124, 92, 252, 0.6); }
+.text-glow-gold   { text-shadow: 0 0 20px rgba(240, 180, 41, 0.5); }
+
+/* ── Gradient text utility ── */
+.gradient-text-violet {
+  background: linear-gradient(135deg, #a78bfa, #7c5cfc, #4f46e5);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.gradient-text-gold {
+  background: linear-gradient(135deg, #fbbf24, #f0b429, #d97706);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Glass card ── */
+.glass {
+  background: rgba(13, 13, 31, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* ── RTL ── */
+[dir="rtl"] .flip-rtl { transform: scaleX(-1); }
+
+/* ── Animated gradient border ── */
+.border-gradient {
+  position: relative;
+}
+.border-gradient::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(124,92,252,0.5), rgba(240,180,41,0.3), rgba(124,92,252,0.1));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* ── Status badges ── */
+.badge-complete { background: rgba(34,197,94,0.1); color: #4ade80; border: 1px solid rgba(34,197,94,0.25); }
+.badge-beta     { background: rgba(245,158,11,0.1); color: #fbbf24; border: 1px solid rgba(245,158,11,0.25); }
+.badge-partial  { background: rgba(99,102,241,0.1); color: #818cf8; border: 1px solid rgba(99,102,241,0.25); }
+
+/* ── Download button ── */
+.btn-download {
+  background: linear-gradient(135deg, #7c5cfc, #5b3ee0);
+  box-shadow: 0 4px 24px rgba(124, 92, 252, 0.35);
+  transition: all 0.2s ease;
+}
+.btn-download:hover {
+  box-shadow: 0 6px 32px rgba(124, 92, 252, 0.55);
+  transform: translateY(-1px);
+}
+
+/* ── Game card hover ── */
+.game-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.game-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(124,92,252,0.3);
+}
+
+/* ── Prose overrides ── */
+.prose-game {
+  color: var(--color-text-secondary);
+  line-height: 1.8;
+}
+.prose-game h2 { color: var(--color-text-primary); font-size: 1.1rem; font-weight: 700; margin-bottom: 0.75rem; margin-top: 2rem; }
+.prose-game p, .prose-game li { font-size: 0.9rem; }
+.prose-game strong { color: var(--color-text-primary); }
+.prose-game ul { padding-inline-start: 1.5rem; list-style: disc; }

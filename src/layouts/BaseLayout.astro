@@ -1,0 +1,62 @@
+---
+import "../styles/global.css";
+import Navbar from "../components/Navbar.astro";
+import Footer from "../components/Footer.astro";
+import { getLangFromUrl, useTranslations } from "../i18n/ui";
+
+interface Props {
+  title?: string;
+  description?: string;
+  ogImage?: string;
+}
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const dir = lang === "ar" ? "rtl" : "ltr";
+
+const {
+  title = t("meta.site_name"),
+  description = t("meta.description"),
+  ogImage = "/og-default.jpg",
+} = Astro.props;
+
+const siteName = t("meta.site_name");
+const fullTitle = title === siteName ? siteName : `${title} — ${siteName}`;
+---
+
+<!doctype html>
+<html lang={lang} dir={dir} class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <meta name="robots" content="index, follow" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={siteName} />
+
+    <!-- Alternate languages -->
+    <link rel="alternate" hreflang="ar" href={Astro.url.href.replace(`/${lang}/`, "/ar/")} />
+    <link rel="alternate" hreflang="en" href={Astro.url.href.replace(`/${lang}/`, "/en/")} />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{fullTitle}</title>
+
+    <!-- Cloudflare Web Analytics (async, privacy-first, free) -->
+    <script
+      defer
+      src="https://static.cloudflareinsights.com/beacon.min.js"
+      data-cf-beacon='{"token": "REPLACE_WITH_YOUR_TOKEN"}'></script>
+  </head>
+  <body class="min-h-screen flex flex-col bg-[#0a0a0f]">
+    <Navbar lang={lang} />
+    <main class="flex-1">
+      <slot />
+    </main>
+    <Footer lang={lang} />
+  </body>
+</html>
