@@ -4,53 +4,53 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* ------------------------------------------------------------------ *
- * Palette — ArgusOs Cyber Neon Gaming Hub:
- * Electric neon green (#00ff66) on deep obsidian black (#030704).
- * Inspired by cyber HUD interfaces and high-end gaming portals.
+ * Minimalist, Modern Gaming Palette (Inspired by Muarrab, Ta3reb, Steam):
+ * Clean Slate/Neutral Dark background (#0c0e12 / #12151c) with crisp Indigo/Sky accent.
+ * Legible, modern, non-cluttered typography & subtle glass borders.
  * ------------------------------------------------------------------ */
 :root {
-  --background: #030704;
-  --surface: #07100a;
-  --surface-2: #0d1e12;
-  --foreground: #e6fcf0;
-  --muted: #739980;
-  --border: #132d19;
-  --border-strong: #1e4a27;
-  --accent: #00ff66;
-  --accent-hover: #1eff75;
-  --accent-foreground: #020703;
-  --accent-soft: rgba(0, 255, 102, 0.12);
-  --data: #10b981;
-  --success: #00ff66;
-  --warning: #f59e0b;
-  --danger: #ef4444;
-  --info: #06b6d4;
+  --background: #f8fafc;
+  --surface: #ffffff;
+  --surface-2: #f1f5f9;
+  --foreground: #0f172a;
+  --muted: #64748b;
+  --border: #e2e8f0;
+  --border-strong: #cbd5e1;
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --accent-foreground: #ffffff;
+  --accent-soft: rgba(37, 99, 235, 0.08);
+  --data: #0284c7;
+  --success: #16a34a;
+  --warning: #d97706;
+  --danger: #dc2626;
+  --info: #0284c7;
 
-  --ring: #00ff66;
-  --shadow-color: 140 100% 10%;
-  color-scheme: dark;
+  --ring: #2563eb;
+  --shadow-color: 220 20% 90%;
+  color-scheme: light;
 }
 
 .dark {
-  --background: #020503;
-  --surface: #060e08;
-  --surface-2: #0a180e;
-  --foreground: #e8fcf1;
-  --muted: #6f947b;
-  --border: #112816;
-  --border-strong: #1b4423;
-  --accent: #00ff66;
-  --accent-hover: #1eff75;
-  --accent-foreground: #020703;
-  --accent-soft: rgba(0, 255, 102, 0.14);
-  --data: #10b981;
-  --success: #00ff66;
+  --background: #090b0e;
+  --surface: #10141a;
+  --surface-2: #161b24;
+  --foreground: #f1f5f9;
+  --muted: #8b9bb4;
+  --border: #1e2634;
+  --border-strong: #2a3447;
+  --accent: #3b82f6;
+  --accent-hover: #60a5fa;
+  --accent-foreground: #ffffff;
+  --accent-soft: rgba(59, 130, 246, 0.12);
+  --data: #38bdf8;
+  --success: #22c55e;
   --warning: #f59e0b;
   --danger: #ef4444;
-  --info: #06b6d4;
+  --info: #38bdf8;
 
-  --ring: #00ff66;
-  --shadow-color: 140 100% 5%;
+  --ring: #3b82f6;
+  --shadow-color: 220 40% 4%;
   color-scheme: dark;
 }
 
@@ -75,17 +75,17 @@
   --font-sans: var(--font-latin), ui-sans-serif, system-ui, sans-serif;
   --font-arabic: var(--font-arabic), var(--font-latin), sans-serif;
 
-  --radius-card: 14px;
-  --radius-control: 10px;
+  --radius-card: 16px;
+  --radius-control: 12px;
 
-  --animate-rise: rise 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
-  --animate-fade: fade 0.4s ease-out both;
+  --animate-rise: rise 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-fade: fade 0.3s ease-out both;
 }
 
 @keyframes rise {
   from {
     opacity: 0;
-    transform: translateY(14px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
@@ -99,15 +99,6 @@
   }
   to {
     opacity: 1;
-  }
-}
-
-@keyframes cyber-pulse {
-  0%, 100% {
-    box-shadow: 0 0 15px rgba(0, 255, 102, 0.35), inset 0 0 15px rgba(0, 255, 102, 0.05);
-  }
-  50% {
-    box-shadow: 0 0 25px rgba(0, 255, 102, 0.6), inset 0 0 20px rgba(0, 255, 102, 0.15);
   }
 }
 
@@ -128,75 +119,46 @@
     font-family: var(--font-sans);
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
-    background-image: 
-      radial-gradient(circle at 50% 0%, rgba(0, 255, 102, 0.08), transparent 45%),
-      linear-gradient(to bottom, transparent, rgba(2, 5, 3, 0.95));
     min-height: 100vh;
   }
 
-  /* Numerals in data read as a column, not a jumble. */
   .tabular {
     font-variant-numeric: tabular-nums;
   }
 
   ::selection {
-    background: rgba(0, 255, 102, 0.35);
-    color: #ffffff;
+    background: var(--accent);
+    color: var(--accent-foreground);
   }
 
   :focus-visible {
     outline: 2px solid var(--ring);
     outline-offset: 2px;
-    border-radius: 4px;
+    border-radius: 6px;
   }
 
   * {
     border-color: var(--border);
   }
 
-  /* Browser surfaces carry the design too. */
   :where(input, textarea) {
     caret-color: var(--accent);
   }
 
   ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 7px;
+    height: 7px;
   }
   ::-webkit-scrollbar-track {
-    background: #020503;
+    background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: #15331c;
-    border: 2px solid #020503;
+    background: var(--border-strong);
     border-radius: 999px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #00ff66;
-    box-shadow: 0 0 10px #00ff66;
+    background: var(--muted);
   }
-}
-
-/* Cyber Utilities */
-.cyber-glow {
-  text-shadow: 0 0 15px rgba(0, 255, 102, 0.6), 0 0 30px rgba(0, 255, 102, 0.3);
-}
-
-.cyber-panel {
-  background: rgba(7, 16, 10, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(0, 255, 102, 0.2);
-}
-
-.cyber-panel-hover {
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.cyber-panel-hover:hover {
-  border-color: rgba(0, 255, 102, 0.5);
-  box-shadow: 0 0 25px -5px rgba(0, 255, 102, 0.25);
-  transform: translateY(-2px);
 }
 
 @media (prefers-reduced-motion: reduce) {

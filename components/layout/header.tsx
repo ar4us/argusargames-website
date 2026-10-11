@@ -5,6 +5,7 @@ import {
   LayoutDashboard,
   LogOut,
   Menu,
+  Search,
   User as UserIcon,
   X,
 } from "lucide-react";
@@ -13,7 +14,7 @@ import { useEffect, useRef, useState } from "react";
 import { Wordmark } from "@/components/brand/logo";
 import { LanguageSwitcher } from "@/components/layout/language-switcher";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -42,27 +43,35 @@ export function Header({
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Sync client session & detect OAuth code in URL
   useEffect(() => {
     setCurrentUser(user);
     const supabase = createClient();
 
-    // Check client session
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
         setCurrentUser({
           email: session.user.email ?? null,
-          fullName: (session.user.user_metadata?.full_name || session.user.user_metadata?.name || session.user.email?.split("@")[0]) ?? null,
+          fullName:
+            (session.user.user_metadata?.full_name ||
+              session.user.user_metadata?.name ||
+              session.user.email?.split("@")[0]) ??
+            null,
           role: "admin",
         });
       }
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
         setCurrentUser({
           email: session.user.email ?? null,
-          fullName: (session.user.user_metadata?.full_name || session.user.user_metadata?.name || session.user.email?.split("@")[0]) ?? null,
+          fullName:
+            (session.user.user_metadata?.full_name ||
+              session.user.user_metadata?.name ||
+              session.user.email?.split("@")[0]) ??
+            null,
           role: "admin",
         });
         router.refresh();
@@ -71,7 +80,6 @@ export function Header({
       }
     });
 
-    // If there is an auth code in the current URL, exchange it and clean the URL
     if (typeof window !== "undefined" && window.location.search.includes("code=")) {
       router.refresh();
     }
@@ -89,7 +97,6 @@ export function Header({
     return () => document.removeEventListener("mousedown", onClick);
   }, []);
 
-  // Close the mobile panel whenever the route changes.
   useEffect(() => {
     setMobileOpen(false);
     setMenuOpen(false);
@@ -100,15 +107,13 @@ export function Header({
   const navItems = [
     { href: "/", label: t("home") },
     { href: "/games", label: t("games") },
-    { href: "/games", label: t("patches") },
-    { href: "/tools", label: t("tools") },
-    { href: "/tutorials", label: t("tutorials") },
-    { href: "/about", label: t("about") },
     { href: "/request", label: t("request") },
     ...(isStaff ? [{ href: "/admin", label: t("admin") }] : []),
   ] as const;
 
-  const initial = (currentUser?.fullName || currentUser?.email || "?").slice(0, 1).toUpperCase();
+  const initial = (currentUser?.fullName || currentUser?.email || "?")
+    .slice(0, 1)
+    .toUpperCase();
 
   const handleLogout = async () => {
     try {
@@ -124,8 +129,7 @@ export function Header({
   };
 
   const navLink = (href: string, label: string, onClick?: () => void) => {
-    const active =
-      href === "/" ? pathname === "/" : pathname.startsWith(href);
+    const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
     return (
       <Link
         key={href}
@@ -133,10 +137,10 @@ export function Header({
         onClick={onClick}
         aria-current={active ? "page" : undefined}
         className={cn(
-          "rounded-xl px-4 py-2 text-sm font-bold transition-all duration-200",
+          "rounded-lg px-3.5 py-1.5 text-sm font-medium transition-colors",
           active
-            ? "bg-[#00ff66] text-[#020703] shadow-md shadow-[#00ff66]/25"
-            : "text-[#789d84] hover:text-[#00ff66] hover:bg-[#07170c]",
+            ? "bg-surface-2 text-foreground font-semibold"
+            : "text-muted hover:text-foreground hover:bg-surface-2/60"
         )}
       >
         {label}
@@ -145,18 +149,32 @@ export function Header({
   };
 
   return (
-    <header className="sticky top-0 z-40 border-b border-[#132d19] bg-[#020503]/90 backdrop-blur-xl">
-      <Container className="flex h-18 items-center justify-between gap-4">
+    <header className="sticky top-0 z-40 border-b border-border bg-surface/90 backdrop-blur-md">
+      <Container className="flex h-16 items-center justify-between gap-4">
+        {/* Brand & Nav links */}
         <div className="flex items-center gap-8">
           <Link href="/" aria-label={brandName}>
-            <Wordmark name={brandName} />
+            <Wordmark name={brandName || "Argus Games"} />
           </Link>
-          <nav className="hidden items-center gap-1.5 md:flex bg-[#050e07] p-1 rounded-2xl border border-[#132d19]">
+
+          <nav className="hidden items-center gap-1 md:flex">
             {navItems.map((item) => navLink(item.href, item.label))}
           </nav>
         </div>
 
-        <div className="flex items-center gap-2">
+        {/* Search shortcut & controls */}
+        <div className="flex items-center gap-3">
+          <Link
+            href="/games"
+            className="hidden sm:flex items-center gap-2 rounded-xl border border-border bg-surface-2/50 px-3 py-1.5 text-xs text-muted hover:border-border-strong hover:text-foreground transition-colors"
+          >
+            <Search className="h-3.5 w-3.5" />
+            <span>البحث في التعريبات...</span>
+            <kbd className="ms-2 rounded border border-border bg-surface px-1.5 py-0.5 text-[10px] font-mono">
+              /
+            </kbd>
+          </Link>
+
           <div className="hidden sm:block">
             <LanguageSwitcher />
           </div>
@@ -242,7 +260,7 @@ export function Header({
             onClick={() => setMobileOpen((v) => !v)}
             aria-label={t("menu")}
             aria-expanded={mobileOpen}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-surface text-foreground md:hidden"
+            className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-surface text-foreground md:hidden"
           >
             {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
@@ -250,10 +268,10 @@ export function Header({
       </Container>
 
       {mobileOpen ? (
-        <div className="border-t border-border bg-background md:hidden">
+        <div className="border-t border-border bg-surface md:hidden">
           <Container className="flex flex-col gap-1 py-3">
             {navItems.map((item) =>
-              navLink(item.href, item.label, () => setMobileOpen(false)),
+              navLink(item.href, item.label, () => setMobileOpen(false))
             )}
             <div className="mt-2 flex items-center gap-2">
               <LanguageSwitcher />
