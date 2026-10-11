@@ -1,6 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { GameGrid, Pagination } from "@/components/games/game-grid";
 import { GamesToolbar } from "@/components/games/games-toolbar";
+import { PlatformChips } from "@/components/games/platform-chips";
 import { Container } from "@/components/ui/container";
 import { getGames } from "@/lib/queries";
 import { alternates } from "@/lib/seo";
@@ -60,8 +61,12 @@ export default async function GamesPage({
         <p className="mt-2 text-muted">{t("subtitle")}</p>
       </header>
 
-      <div className="mb-6">
+      <div className="mb-4">
         <GamesToolbar initialQ={q} initialSort={sort} />
+      </div>
+
+      <div className="mb-6">
+        <PlatformChips />
       </div>
 
       <p className="mb-6 text-sm text-muted" aria-live="polite">

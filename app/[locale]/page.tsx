@@ -12,6 +12,9 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { GameCard } from "@/components/games/game-card";
 import { HeroSearch } from "@/components/home/hero-search";
 import { FeatureGrid } from "@/components/home/feature-grid";
+import { CyberTicker } from "@/components/home/cyber-ticker";
+import { FeaturedSlider } from "@/components/home/featured-slider";
+import { PlatformChips } from "@/components/games/platform-chips";
 import { LogoMark } from "@/components/brand/logo";
 import { buttonVariants } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/card";
@@ -50,13 +53,16 @@ export default async function HomePage({
   const tc = await getTranslations("common");
 
   const [latest, popular, stats] = await Promise.all([
-    getLatestGames(4),
+    getLatestGames(8),
     getMostDownloaded(5),
     getStats(),
   ]);
 
   return (
     <>
+      {/* Live Cyber Ticker */}
+      <CyberTicker />
+
       {/* =========================================================================
           HERO SECTION — EXACT REPLICA OF ARGUSOS NEON MOCKUP
          ========================================================================= */}
@@ -166,11 +172,32 @@ export default async function HomePage({
       ) : null}
 
       {/* =========================================================================
-          LATEST LOCALIZATIONS
+          FEATURED SPOTLIGHT CAROUSEL (INSPIRATION: PLAYINARABIC / NAJMSTAR)
+         ========================================================================= */}
+      {latest.length > 0 && (
+        <section className="py-12 border-b border-[#132d19]/60">
+          <Container>
+            <div className="mb-6 flex items-center justify-between">
+              <div>
+                <span className="text-xs font-mono text-[#00ff66] font-bold uppercase tracking-wider">
+                  SPOTLIGHT RELEASES
+                </span>
+                <h2 className="text-2xl sm:text-3xl font-black text-white mt-1">
+                  أبرز التعريبات والإصدارات الحصرية
+                </h2>
+              </div>
+            </div>
+            <FeaturedSlider games={latest.slice(0, 4)} locale={locale} />
+          </Container>
+        </section>
+      )}
+
+      {/* =========================================================================
+          LATEST LOCALIZATIONS WITH PLATFORM CHIPS (INSPIRATION: TA3REB / MUARRAB)
          ========================================================================= */}
       <section className="py-16 border-b border-[#132d19]/60">
         <Container>
-          <div className="mb-8 flex items-end justify-between gap-4">
+          <div className="mb-8 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-2">
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#00ff66]/15 border border-[#00ff66]/30 text-[#00ff66]">
@@ -192,6 +219,11 @@ export default async function HomePage({
               <span>{tc("viewAll")}</span>
               <ArrowRight className="h-4 w-4 rtl:rotate-180" />
             </Link>
+          </div>
+
+          {/* Interactive Platform Filter Bar */}
+          <div className="mb-6">
+            <PlatformChips />
           </div>
 
           {latest.length > 0 ? (
