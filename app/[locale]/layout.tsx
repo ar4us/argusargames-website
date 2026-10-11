@@ -5,6 +5,7 @@ import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
+import { TopCyberBanner } from "@/components/layout/top-banner";
 import { AuthListener } from "@/components/auth/auth-listener";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { ThemeScript } from "@/components/providers/theme-script";
@@ -86,6 +87,7 @@ export default async function LocaleLayout({
       <body className="flex min-h-dvh flex-col">
         <NextIntlClientProvider messages={messages}>
           <ThemeProvider>
+            <TopCyberBanner />
             <Header user={user} brandName={settings.site_name_en} />
             <AuthListener />
             <main className="flex-1">{children}</main>

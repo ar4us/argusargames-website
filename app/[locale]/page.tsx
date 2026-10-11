@@ -1,8 +1,17 @@
-import { ArrowRight, Download, Flame, Sparkles, Gamepad2, Layers, CheckCircle } from "lucide-react";
+import {
+  ArrowRight,
+  Download,
+  Flame,
+  Sparkles,
+  Gamepad2,
+  FileText,
+  Terminal,
+} from "lucide-react";
 import Image from "next/image";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { GameCard } from "@/components/games/game-card";
 import { HeroSearch } from "@/components/home/hero-search";
+import { FeatureGrid } from "@/components/home/feature-grid";
 import { LogoMark } from "@/components/brand/logo";
 import { buttonVariants } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/card";
@@ -48,110 +57,139 @@ export default async function HomePage({
 
   return (
     <>
-      {/* Cinematic Hero */}
-      <section className="relative overflow-hidden border-b border-border bg-gradient-to-b from-surface/50 via-background to-background">
-        {/* Subtle Ambient Radial Backlight */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 h-[450px] w-[900px] max-w-full rounded-full opacity-20 blur-[120px] [background-image:radial-gradient(circle_at_center,var(--accent),transparent_70%)]"
-        />
+      {/* =========================================================================
+          HERO SECTION — EXACT REPLICA OF ARGUSOS NEON MOCKUP
+         ========================================================================= */}
+      <section className="relative overflow-hidden border-b border-[#132d19] bg-[#020503]">
+        {/* Background Hacker Panorama Artwork */}
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/images/branding/hero-bg.png"
+            alt="ArgusOs Cyber World"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center opacity-70"
+          />
+          {/* Gradients to guarantee 100% text legibility and seamless vignette */}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#020503] via-[#020503]/50 to-transparent" />
+          <div className="absolute inset-0 rtl:bg-gradient-to-l ltr:bg-gradient-to-r from-[#020503] via-[#020503]/85 to-transparent" />
+          <div className="absolute inset-0 [background-image:radial-gradient(circle_at_20%_40%,rgba(0,255,102,0.12),transparent_50%)]" />
+        </div>
 
-        <Container className="relative py-16 sm:py-24 lg:py-28 text-center sm:text-start">
-          <div className="max-w-3xl">
-            {/* Pill Header Badge */}
-            <div className="inline-flex items-center gap-2 rounded-full border border-accent/25 bg-accent-soft px-3.5 py-1 text-xs font-semibold text-accent mb-6 backdrop-blur-md">
-              <Sparkles className="h-3.5 w-3.5" />
-              <span>{t("latest")} &bull; تحديثات وتنزيل مباشر فائق السرعة</span>
+        {/* Hero Content */}
+        <Container className="relative z-10 pt-16 pb-12 sm:pt-24 sm:pb-16 lg:pt-28 lg:pb-20">
+          <div className="max-w-2xl">
+            {/* Cyber Terminal Pill */}
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#00ff66]/30 bg-[#06140b]/80 px-3.5 py-1 text-xs font-mono font-bold text-[#00ff66] mb-6 backdrop-blur-md shadow-sm">
+              <span className="flex h-2 w-2 relative">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00ff66] opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00ff66]" />
+              </span>
+              <Terminal className="h-3 w-3" />
+              <span>ARGUSOS • ARABIC GAME LOCALIZATION HUB</span>
             </div>
 
-            <h1 className="text-balance text-4xl font-extrabold leading-[1.1] tracking-[-0.03em] text-foreground sm:text-5xl lg:text-6xl">
-              {t("heroTitle")}
+            {/* Main Headline */}
+            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black leading-[1.08] tracking-tight">
+              <span className="block text-white">عالم الألعاب</span>
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#00ff66] via-[#1eff75] to-[#10b981] drop-shadow-[0_0_35px_rgba(0,255,102,0.5)] mt-2">
+                باللغة العربية
+              </span>
             </h1>
-            <p className="mt-5 max-w-2xl text-base sm:text-lg leading-relaxed text-muted">
-              {t("heroSubtitle")}
+
+            {/* Subtitle */}
+            <p className="mt-6 text-base sm:text-lg text-[#94bfa2] max-w-xl leading-relaxed">
+              موقع متخصص في تعريب الألعاب، يقدم لك باتشات احترافية، شروحات التثبيت، وأدوات التعريب، لتعيش تجربة لعب أفضل.
             </p>
-          </div>
 
-          {/* Hero Search Box */}
-          <div className="mt-8 max-w-2xl">
-            <HeroSearch />
-          </div>
+            {/* CTAs */}
+            <div className="mt-8 flex flex-wrap items-center gap-4">
+              <Link
+                href="/games"
+                className="inline-flex items-center gap-3 px-8 py-4 rounded-xl bg-[#00ff66] text-[#020703] font-black text-base transition-all duration-300 hover:bg-[#22ff77] hover:shadow-[0_0_30px_rgba(0,255,102,0.6)] hover:scale-[1.02] shadow-lg shadow-[#00ff66]/25"
+              >
+                <Gamepad2 className="h-5 w-5 fill-current" />
+                <span>استكشف الألعاب</span>
+                <ArrowRight className="h-5 w-5 rtl:rotate-180" />
+              </Link>
 
-          {/* Stats Cards Row */}
-          <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4 max-w-3xl">
-            <div className="rounded-2xl border border-border bg-surface/80 p-4 backdrop-blur-md shadow-sm transition-all hover:border-accent/30">
-              <span className="block text-2xl font-extrabold tracking-tight text-foreground tabular">
-                {formatNumber(stats.games, locale)}
-              </span>
-              <span className="mt-0.5 block text-xs font-medium text-muted">
-                {t("statsGames")}
-              </span>
+              <Link
+                href="/games"
+                className="inline-flex items-center gap-3 px-7 py-4 rounded-xl bg-[#07140b]/90 border border-[#1b4423] text-white font-bold text-base transition-all duration-300 hover:border-[#00ff66] hover:bg-[#0c2213] hover:text-[#00ff66] backdrop-blur-md"
+              >
+                <FileText className="h-5 w-5 text-[#00ff66]" />
+                <span>جميع الباتشات</span>
+              </Link>
             </div>
 
-            <div className="rounded-2xl border border-border bg-surface/80 p-4 backdrop-blur-md shadow-sm transition-all hover:border-accent/30">
-              <span className="block text-2xl font-extrabold tracking-tight text-foreground tabular">
-                {formatNumber(stats.versions, locale)}
-              </span>
-              <span className="mt-0.5 block text-xs font-medium text-muted">
-                {t("statsVersions")}
-              </span>
+            {/* Quick Search */}
+            <div className="mt-8 max-w-xl">
+              <HeroSearch />
             </div>
 
-            <div className="rounded-2xl border border-border bg-surface/80 p-4 backdrop-blur-md shadow-sm transition-all hover:border-accent/30">
-              <span className="block text-2xl font-extrabold tracking-tight text-accent tabular">
-                {formatNumber(stats.downloads, locale)}
+            {/* Live Stats */}
+            <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs font-mono text-[#789d84]">
+              <span className="tabular flex items-center gap-1.5">
+                <span className="text-[#00ff66] font-bold">[{formatNumber(stats.games, locale)}]</span>
+                <span>{t("statsGames")}</span>
               </span>
-              <span className="mt-0.5 block text-xs font-medium text-muted">
-                {t("statsDownloads")}
+              <span className="text-[#193a20]">•</span>
+              <span className="tabular flex items-center gap-1.5">
+                <span className="text-[#00ff66] font-bold">[{formatNumber(stats.versions, locale)}]</span>
+                <span>{t("statsVersions")}</span>
+              </span>
+              <span className="text-[#193a20]">•</span>
+              <span className="tabular flex items-center gap-1.5">
+                <span className="text-[#00ff66] font-bold">[{formatNumber(stats.downloads, locale)}]</span>
+                <span>{t("statsDownloads")}</span>
               </span>
             </div>
-
-            <Link
-              href="/games"
-              className="group flex flex-col justify-between rounded-2xl border border-border bg-surface/80 p-4 backdrop-blur-md shadow-sm transition-all hover:border-accent hover:bg-accent-soft"
-            >
-              <div className="flex items-center justify-between">
-                <Gamepad2 className="h-5 w-5 text-accent" />
-                <ArrowRight className="h-4 w-4 text-muted transition-transform group-hover:translate-x-1 rtl:group-hover:-translate-x-1 rtl:rotate-180" />
-              </div>
-              <span className="mt-2 text-xs font-bold text-foreground group-hover:text-accent">
-                {t("browseAll")} &larr;
-              </span>
-            </Link>
           </div>
         </Container>
+
+        {/* 6 Feature Highlights Bar matching the mockup base */}
+        <div className="border-t border-[#132d19] bg-[#020503]/90 py-6">
+          <Container>
+            <FeatureGrid />
+          </Container>
+        </div>
       </section>
 
       {!isSupabaseConfigured() ? (
         <Container className="pt-6">
-          <div className="rounded-[var(--radius-card)] border border-warning/40 bg-[color-mix(in_oklab,var(--warning)_10%,transparent)] px-4 py-3 text-sm">
+          <div className="rounded-xl border border-warning/40 bg-warning/10 px-4 py-3 text-sm">
             <span className="font-semibold text-warning">Setup — </span>
             {tc("error")} Supabase. See README.
           </div>
         </Container>
       ) : null}
 
-      {/* Latest Localizations Grid */}
-      <section className="py-16">
+      {/* =========================================================================
+          LATEST LOCALIZATIONS
+         ========================================================================= */}
+      <section className="py-16 border-b border-[#132d19]/60">
         <Container>
           <div className="mb-8 flex items-end justify-between gap-4">
             <div>
               <div className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent-soft text-accent">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#00ff66]/15 border border-[#00ff66]/30 text-[#00ff66]">
                   <Sparkles className="h-4 w-4" />
                 </div>
-                <h2 className="text-2xl font-bold tracking-tight text-foreground">
+                <h2 className="text-2xl font-black tracking-tight text-white">
                   {t("latest")}
                 </h2>
               </div>
-              <p className="mt-1 text-sm text-muted">أحدث تعريبات الألعاب التي تم إطلاقها أو تحديثها حديثاً</p>
+              <p className="mt-1 text-sm text-[#789d84]">
+                أحدث تعريبات الألعاب التي تم إطلاقها أو تحديثها حديثاً
+              </p>
             </div>
 
             <Link
               href="/games"
-              className="inline-flex items-center gap-1.5 text-sm font-semibold text-accent hover:underline"
+              className="inline-flex items-center gap-1.5 text-sm font-bold text-[#00ff66] hover:underline font-mono"
             >
-              {tc("viewAll")}
+              <span>{tc("viewAll")}</span>
               <ArrowRight className="h-4 w-4 rtl:rotate-180" />
             </Link>
           </div>
@@ -164,7 +202,7 @@ export default async function HomePage({
             </div>
           ) : (
             <EmptyState
-              icon={<LogoMark className="h-8 w-8" />}
+              icon={<LogoMark className="h-10 w-10" />}
               title={tc("empty")}
               description="لم يتم نشر أي ألعاب بعد. يمكنك طلب تعريب لعبتك المفضلة الآن!"
               action={
@@ -180,33 +218,37 @@ export default async function HomePage({
         </Container>
       </section>
 
-      {/* Most Downloaded Games Ranked List */}
+      {/* =========================================================================
+          MOST DOWNLOADED RANKED LIST
+         ========================================================================= */}
       {popular.length > 0 ? (
-        <section className="pb-16">
+        <section className="py-16 border-b border-[#132d19]/60">
           <Container>
             <div className="mb-8 flex items-end justify-between gap-4">
               <div>
                 <div className="flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500/10 text-amber-500">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#00ff66]/15 border border-[#00ff66]/30 text-[#00ff66]">
                     <Flame className="h-4 w-4" />
                   </div>
-                  <h2 className="text-2xl font-bold tracking-tight text-foreground">
+                  <h2 className="text-2xl font-black tracking-tight text-white">
                     {t("mostDownloaded")}
                   </h2>
                 </div>
-                <p className="mt-1 text-sm text-muted">التعريبات الأكثر شعبية وتحميلاً من قبل اللاعبين</p>
+                <p className="mt-1 text-sm text-[#789d84]">
+                  التعريبات الأكثر شعبية وتحميلاً من قبل اللاعبين
+                </p>
               </div>
 
               <Link
                 href={{ pathname: "/games", query: { sort: "downloads" } }}
-                className="inline-flex items-center gap-1.5 text-sm font-semibold text-accent hover:underline"
+                className="inline-flex items-center gap-1.5 text-sm font-bold text-[#00ff66] hover:underline font-mono"
               >
-                {tc("viewAll")}
+                <span>{tc("viewAll")}</span>
                 <ArrowRight className="h-4 w-4 rtl:rotate-180" />
               </Link>
             </div>
 
-            <ol className="overflow-hidden rounded-2xl border border-border bg-surface shadow-sm divide-y divide-border/60">
+            <ol className="overflow-hidden rounded-2xl border border-[#142e1a] bg-[#061009] shadow-xl divide-y divide-[#142e1a]">
               {popular.map((game, index) => (
                 <PopularRow
                   key={game.id}
@@ -220,26 +262,28 @@ export default async function HomePage({
         </section>
       ) : null}
 
-      {/* Request Band CTA */}
-      <section className="pb-16">
+      {/* =========================================================================
+          COMMUNITY REQUEST BANNER
+         ========================================================================= */}
+      <section className="py-16">
         <Container>
-          <div className="relative overflow-hidden rounded-3xl border border-accent/30 bg-gradient-to-br from-accent/10 via-surface to-surface p-8 sm:p-12 shadow-md">
+          <div className="relative overflow-hidden rounded-3xl border border-[#00ff66]/30 bg-gradient-to-br from-[#0a1e11] via-[#050e08] to-[#020503] p-8 sm:p-12 shadow-2xl">
             <div className="max-w-xl">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-accent/20 px-3 py-1 text-xs font-bold text-accent mb-4">
-                صوت المجتمع
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-[#00ff66]/15 border border-[#00ff66]/30 px-3 py-1 text-xs font-mono font-bold text-[#00ff66] mb-4">
+                COMMUNITY REQUESTS • صوت المجتمع
               </span>
-              <h2 className="text-2xl font-extrabold tracking-tight text-foreground sm:text-3xl">
+              <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
                 {t("requestTitle")}
               </h2>
-              <p className="mt-3 text-base text-muted leading-relaxed">
+              <p className="mt-3 text-base text-[#8cb097] leading-relaxed">
                 {t("requestText")}
               </p>
               <div className="mt-6 flex flex-wrap items-center gap-3">
                 <Link
                   href="/request"
-                  className={`${buttonVariants({ size: "lg" })} rounded-xl font-bold`}
+                  className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-[#00ff66] text-[#020703] font-black text-sm transition-all duration-300 hover:bg-[#22ff77] hover:shadow-[0_0_25px_rgba(0,255,102,0.5)] shadow-lg shadow-[#00ff66]/20"
                 >
-                  {t("requestCta")}
+                  <span>{t("requestCta")}</span>
                   <ArrowRight className="h-4 w-4 rtl:rotate-180" />
                 </Link>
               </div>
@@ -264,7 +308,7 @@ async function PopularRow({
   const t = await getTranslations("game");
 
   const rankBadgeColors = [
-    "bg-amber-500 text-black shadow-md shadow-amber-500/20", // 1st Gold
+    "bg-[#00ff66] text-[#020703] shadow-md shadow-[#00ff66]/30", // 1st Cyber Neon
     "bg-slate-300 text-black shadow-md shadow-slate-300/20", // 2nd Silver
     "bg-amber-700 text-white shadow-md shadow-amber-700/20", // 3rd Bronze
   ];
@@ -273,17 +317,17 @@ async function PopularRow({
     <li>
       <Link
         href={`/games/${game.slug}`}
-        className="group flex items-center gap-4 px-5 py-4 transition-colors hover:bg-surface-2"
+        className="group flex items-center gap-4 px-5 py-4 transition-colors hover:bg-[#0a180f]"
       >
         <span
-          className={`tabular flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
-            index < 3 ? rankBadgeColors[index] : "bg-surface-2 text-muted"
+          className={`tabular font-mono flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-black ${
+            index < 3 ? rankBadgeColors[index] : "bg-[#0c1c11] text-[#789d84]"
           }`}
         >
           {index + 1}
         </span>
 
-        <span className="relative h-14 w-10 shrink-0 overflow-hidden rounded-lg bg-surface-2 shadow-sm">
+        <span className="relative h-14 w-10 shrink-0 overflow-hidden rounded-lg bg-[#0a180e] shadow-sm">
           {game.cover_url ? (
             <Image
               src={game.cover_url}
@@ -298,23 +342,23 @@ async function PopularRow({
         </span>
 
         <span className="min-w-0 flex-1">
-          <span className="block truncate text-base font-bold text-foreground group-hover:text-accent transition-colors">
+          <span className="block truncate text-base font-bold text-white group-hover:text-[#00ff66] transition-colors">
             {title}
           </span>
           <span className="flex items-center gap-2 mt-0.5">
-            <span className="text-xs text-muted font-mono">{game.title_en}</span>
+            <span className="text-xs text-[#789d84] font-mono">{game.title_en}</span>
             {game.latest_version ? (
-              <span className="tabular text-[11px] font-semibold text-accent bg-accent-soft px-1.5 py-0.2 rounded">
+              <span className="tabular font-mono text-[11px] font-bold text-[#00ff66] bg-[#00ff66]/10 px-1.5 py-0.2 rounded border border-[#00ff66]/20">
                 v{game.latest_version}
               </span>
             ) : null}
           </span>
         </span>
 
-        <span className="tabular inline-flex shrink-0 items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1 text-xs font-semibold text-muted group-hover:border-accent/40 group-hover:text-accent transition-colors">
-          <Download className="h-3.5 w-3.5 text-accent" />
+        <span className="tabular font-mono inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[#142e1a] bg-[#07120a] px-3.5 py-1 text-xs font-bold text-[#789d84] group-hover:border-[#00ff66]/40 group-hover:text-[#00ff66] transition-colors">
+          <Download className="h-3.5 w-3.5 text-[#00ff66]" />
           <span>{formatNumber(game.download_count ?? 0, locale)}</span>
-          <span className="hidden sm:inline font-normal">{t("downloads")}</span>
+          <span className="hidden sm:inline font-normal text-[11px]">{t("downloads")}</span>
         </span>
       </Link>
     </li>

@@ -95,13 +95,15 @@ export function Header({
     setMenuOpen(false);
   }, [pathname, locale]);
 
+  const isStaff = currentUser?.role === "admin" || currentUser?.role === "editor";
+
   const navItems = [
     { href: "/", label: t("home") },
     { href: "/games", label: t("games") },
     { href: "/request", label: t("request") },
+    ...(isStaff ? [{ href: "/admin", label: t("admin") }] : []),
   ] as const;
 
-  const isStaff = currentUser?.role === "admin" || currentUser?.role === "editor";
   const initial = (currentUser?.fullName || currentUser?.email || "?").slice(0, 1).toUpperCase();
 
   const handleLogout = async () => {
@@ -127,10 +129,10 @@ export function Header({
         onClick={onClick}
         aria-current={active ? "page" : undefined}
         className={cn(
-          "rounded-xl px-4 py-2 text-sm font-semibold transition-all duration-200",
+          "rounded-xl px-4 py-2 text-sm font-bold transition-all duration-200",
           active
-            ? "bg-accent text-accent-foreground shadow-sm shadow-accent/20"
-            : "text-muted hover:text-foreground hover:bg-surface-2",
+            ? "bg-[#00ff66] text-[#020703] shadow-md shadow-[#00ff66]/25"
+            : "text-[#789d84] hover:text-[#00ff66] hover:bg-[#07170c]",
         )}
       >
         {label}
@@ -139,13 +141,13 @@ export function Header({
   };
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border/80 bg-background/80 backdrop-blur-xl">
+    <header className="sticky top-0 z-40 border-b border-[#132d19] bg-[#020503]/90 backdrop-blur-xl">
       <Container className="flex h-18 items-center justify-between gap-4">
         <div className="flex items-center gap-8">
           <Link href="/" aria-label={brandName}>
             <Wordmark name={brandName} />
           </Link>
-          <nav className="hidden items-center gap-1.5 md:flex bg-surface/60 p-1 rounded-2xl border border-border/60">
+          <nav className="hidden items-center gap-1.5 md:flex bg-[#050e07] p-1 rounded-2xl border border-[#132d19]">
             {navItems.map((item) => navLink(item.href, item.label))}
           </nav>
         </div>

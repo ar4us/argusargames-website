@@ -4,52 +4,53 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* ------------------------------------------------------------------ *
- * Palette — "clean modern catalogue": cool ink neutrals on paper,
- * one vivid action accent (violet), one data accent (amber).
+ * Palette — ArgusOs Cyber Neon Gaming Hub:
+ * Electric neon green (#00ff66) on deep obsidian black (#030704).
+ * Inspired by cyber HUD interfaces and high-end gaming portals.
  * ------------------------------------------------------------------ */
 :root {
-  --background: #fbfbfa;
-  --surface: #ffffff;
-  --surface-2: #f4f4f2;
-  --foreground: #14151a;
-  --muted: #5b6070;
-  --border: #e3e3df;
-  --border-strong: #d2d2cc;
-  --accent: #6d28d9;
-  --accent-hover: #5b21b6;
-  --accent-foreground: #ffffff;
-  --accent-soft: #f2ecfe;
-  --data: #b45309;
-  --success: #15803d;
-  --warning: #b45309;
-  --danger: #dc2626;
-  --info: #1d4ed8;
+  --background: #030704;
+  --surface: #07100a;
+  --surface-2: #0d1e12;
+  --foreground: #e6fcf0;
+  --muted: #739980;
+  --border: #132d19;
+  --border-strong: #1e4a27;
+  --accent: #00ff66;
+  --accent-hover: #1eff75;
+  --accent-foreground: #020703;
+  --accent-soft: rgba(0, 255, 102, 0.12);
+  --data: #10b981;
+  --success: #00ff66;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --info: #06b6d4;
 
-  --ring: #7c3aed;
-  --shadow-color: 240 6% 40%;
-  color-scheme: light;
+  --ring: #00ff66;
+  --shadow-color: 140 100% 10%;
+  color-scheme: dark;
 }
 
 .dark {
-  --background: #0c0d11;
-  --surface: #15171e;
-  --surface-2: #1c1f28;
-  --foreground: #f3f4f6;
-  --muted: #a2a7b4;
-  --border: #262a34;
-  --border-strong: #333846;
-  --accent: #8b5cf6;
-  --accent-hover: #a78bfa;
-  --accent-foreground: #0c0d11;
-  --accent-soft: #241b3d;
-  --data: #fbbf24;
-  --success: #4ade80;
-  --warning: #fbbf24;
-  --danger: #f87171;
-  --info: #7ba2ff;
+  --background: #020503;
+  --surface: #060e08;
+  --surface-2: #0a180e;
+  --foreground: #e8fcf1;
+  --muted: #6f947b;
+  --border: #112816;
+  --border-strong: #1b4423;
+  --accent: #00ff66;
+  --accent-hover: #1eff75;
+  --accent-foreground: #020703;
+  --accent-soft: rgba(0, 255, 102, 0.14);
+  --data: #10b981;
+  --success: #00ff66;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --info: #06b6d4;
 
-  --ring: #a78bfa;
-  --shadow-color: 240 40% 3%;
+  --ring: #00ff66;
+  --shadow-color: 140 100% 5%;
   color-scheme: dark;
 }
 
@@ -101,10 +102,20 @@
   }
 }
 
+@keyframes cyber-pulse {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(0, 255, 102, 0.35), inset 0 0 15px rgba(0, 255, 102, 0.05);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(0, 255, 102, 0.6), inset 0 0 20px rgba(0, 255, 102, 0.15);
+  }
+}
+
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
     scroll-behavior: smooth;
+    background-color: var(--background);
   }
 
   html[dir="rtl"] body {
@@ -117,6 +128,10 @@
     font-family: var(--font-sans);
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
+    background-image: 
+      radial-gradient(circle at 50% 0%, rgba(0, 255, 102, 0.08), transparent 45%),
+      linear-gradient(to bottom, transparent, rgba(2, 5, 3, 0.95));
+    min-height: 100vh;
   }
 
   /* Numerals in data read as a column, not a jumble. */
@@ -125,8 +140,8 @@
   }
 
   ::selection {
-    background: color-mix(in oklab, var(--accent) 28%, transparent);
-    color: var(--foreground);
+    background: rgba(0, 255, 102, 0.35);
+    color: #ffffff;
   }
 
   :focus-visible {
@@ -145,20 +160,43 @@
   }
 
   ::-webkit-scrollbar {
-    width: 12px;
-    height: 12px;
+    width: 8px;
+    height: 8px;
   }
   ::-webkit-scrollbar-track {
-    background: var(--background);
+    background: #020503;
   }
   ::-webkit-scrollbar-thumb {
-    background: var(--border-strong);
-    border: 3px solid var(--background);
+    background: #15331c;
+    border: 2px solid #020503;
     border-radius: 999px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: var(--muted);
+    background: #00ff66;
+    box-shadow: 0 0 10px #00ff66;
   }
+}
+
+/* Cyber Utilities */
+.cyber-glow {
+  text-shadow: 0 0 15px rgba(0, 255, 102, 0.6), 0 0 30px rgba(0, 255, 102, 0.3);
+}
+
+.cyber-panel {
+  background: rgba(7, 16, 10, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 255, 102, 0.2);
+}
+
+.cyber-panel-hover {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cyber-panel-hover:hover {
+  border-color: rgba(0, 255, 102, 0.5);
+  box-shadow: 0 0 25px -5px rgba(0, 255, 102, 0.25);
+  transform: translateY(-2px);
 }
 
 @media (prefers-reduced-motion: reduce) {
