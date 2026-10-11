@@ -1,0 +1,200 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-10T00:00:00.000Z",
+  "title": "Design System: ArgusArGames",
+  "extensions": {
+    "colorMeta": {
+      "violet": {
+        "role": "primary",
+        "displayName": "Route Violet",
+        "canonical": "oklch(49% 0.22 286)",
+        "dark": "#8b5cf6",
+        "tonalRamp": [
+          "oklch(15% 0.06 286)",
+          "oklch(27% 0.12 286)",
+          "oklch(38% 0.18 286)",
+          "oklch(49% 0.22 286)",
+          "oklch(61% 0.25 286)",
+          "oklch(72% 0.24 286)",
+          "oklch(83% 0.18 286)",
+          "oklch(95% 0.05 286)"
+        ]
+      },
+      "violet-deep": {
+        "role": "primary",
+        "displayName": "Route Violet (deep)",
+        "canonical": "oklch(42% 0.20 286)",
+        "dark": "#a78bfa",
+        "tonalRamp": []
+      },
+      "violet-wash": {
+        "role": "primary",
+        "displayName": "Violet Wash",
+        "canonical": "oklch(96% 0.02 288)",
+        "dark": "#241b3d",
+        "tonalRamp": []
+      },
+      "amber-data": {
+        "role": "secondary",
+        "displayName": "Data Amber",
+        "canonical": "oklch(54% 0.15 60)",
+        "dark": "#fbbf24",
+        "tonalRamp": [
+          "oklch(15% 0.04 60)",
+          "oklch(28% 0.08 60)",
+          "oklch(41% 0.12 60)",
+          "oklch(54% 0.15 60)",
+          "oklch(66% 0.16 60)",
+          "oklch(77% 0.15 60)",
+          "oklch(88% 0.10 60)",
+          "oklch(97% 0.03 60)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Cool Ink",
+        "canonical": "oklch(18% 0.005 270)",
+        "dark": "#f3f4f6",
+        "tonalRamp": ["oklch(15% 0.005 270)", "oklch(30% 0.005 270)", "oklch(45% 0.005 270)", "oklch(58% 0.004 270)", "oklch(71% 0.004 270)", "oklch(83% 0.004 270)", "oklch(91% 0.003 270)", "oklch(98% 0.002 270)"]
+      },
+      "paper-bg": {
+        "role": "neutral",
+        "displayName": "Paper",
+        "canonical": "oklch(98% 0.002 270)",
+        "dark": "#0c0d11",
+        "tonalRamp": []
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Surface",
+        "canonical": "oklch(100% 0 0)",
+        "dark": "#15171e",
+        "tonalRamp": []
+      },
+      "success": {
+        "role": "semantic",
+        "displayName": "Success Green",
+        "canonical": "oklch(46% 0.16 152)",
+        "dark": "#4ade80",
+        "tonalRamp": []
+      },
+      "danger": {
+        "role": "semantic",
+        "displayName": "Danger Red",
+        "canonical": "oklch(55% 0.23 27)",
+        "dark": "#f87171",
+        "tonalRamp": []
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Home hero only — next to the working search." },
+      "headline": { "displayName": "Headline", "purpose": "Page titles (Games, a game, Request)." },
+      "title": { "displayName": "Title", "purpose": "Section headers with an icon lead." },
+      "body": { "displayName": "Body", "purpose": "Descriptions and notes within 65-75ch." },
+      "label": { "displayName": "Label", "purpose": "Field labels, overlines, small meta." }
+    },
+    "shadows": [
+      { "name": "lift", "value": "0 10px 24px -8px rgba(24, 26, 41, 0.14)", "purpose": "Only on press-ready cards (game card hover); faint ambient under the hero search." }
+    ],
+    "motion": [
+      { "name": "rise", "value": "rise 0.6s cubic-bezier(0.16, 1, 0.3, 1) both", "purpose": "The single authored entrance per viewport." },
+      { "name": "fade", "value": "fade 0.4s ease-out both", "purpose": "Quiet reveals." },
+      { "name": "state", "value": "transition: background-color 150ms ease-out, border-color 150ms ease-out, color 150ms ease-out, transform 200ms ease-out", "purpose": "All control state transitions." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The single action accent — downloads, submits, creations.",
+      "html": "<button class=\"ds-btn-primary\" type=\"button\"><svg class=\"ds-ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\"/><polyline points=\"7 10 12 15 17 10\"/><line x1=\"12\" y1=\"15\" x2=\"12\" y2=\"3\"/></svg><span>Download latest</span><span class=\"ds-count\">(1,284)</span></button>",
+      "css": ".ds-btn-primary{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:44px;padding:0 16px;border:0;border-radius:10px;background:var(--accent,#6d28d9);color:var(--accent-foreground,#ffffff);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 1px 2px rgba(20,21,26,0.05);transition:background-color 150ms ease-out, transform 200ms ease-out}.ds-btn-primary:hover{background:var(--accent-hover,#5b21b6)}.ds-btn-primary:active{transform:translateY(1px)}.ds-btn-primary:focus-visible{outline:2px solid var(--ring,#7c3aed);outline-offset:2px;border-radius:4px}.ds-btn-primary .ds-ic{width:16px;height:16px}.ds-count{opacity:0.8;font-variant-numeric:tabular-nums}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Quiet confirm/aux actions on paper line.",
+      "html": "<button class=\"ds-btn-secondary\" type=\"button\">Manage games</button>",
+      "css": ".ds-btn-secondary{display:inline-flex;align-items:center;justify-content:center;height:40px;padding:0 12px;border:1px solid var(--border,#e3e3df);border-radius:10px;background:var(--surface,#ffffff);color:var(--foreground,#14151a);font-family:inherit;font-size:14px;font-weight:500;cursor:pointer;transition:background-color 150ms ease-out,border-color 150ms ease-out}.ds-btn-secondary:hover{background:var(--surface-2,#f4f4f2)}.ds-btn-secondary:focus-visible{outline:2px solid var(--ring,#7c3aed);outline-offset:2px;border-radius:4px}"
+    },
+    {
+      "name": "Input Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "White surface, hairline border, violet focus ring.",
+      "html": "<label class=\"ds-label\" for=\"ds-q\">Game name</label><input class=\"ds-input\" id=\"ds-q\" type=\"text\" placeholder=\"e.g. Elden Ring\" />",
+      "css": ".ds-label{display:block;margin-bottom:6px;font-size:14px;font-weight:600;color:var(--foreground,#14151a)}.ds-input{width:100%;height:44px;padding:0 14px;border:1px solid var(--border,#e3e3df);border-radius:10px;background:var(--surface,#ffffff);color:var(--foreground,#14151a);font-family:inherit;font-size:14px;transition:border-color 150ms ease-out,box-shadow 150ms ease-out}.ds-input::placeholder{color:var(--muted,#5b6070)}.ds-input:hover{border-color:var(--border-strong,#d2d2cc)}.ds-input:focus{outline:none;border-color:var(--accent,#6d28d9);box-shadow:0 0 0 2px color-mix(in oklab,var(--accent,#6d28d9) 35%, transparent)}"
+    },
+    {
+      "name": "Hero Search",
+      "kind": "custom",
+      "refersTo": "input",
+      "description": "The working search that leads the home page — a pill shell with action affordance.",
+      "html": "<form class=\"ds-search\" role=\"search\"><svg class=\"ds-search-ic\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"11\" cy=\"11\" r=\"8\"/><line x1=\"21\" y1=\"21\" x2=\"16.65\" y2=\"16.65\"/></svg><input class=\"ds-search-in\" type=\"text\" placeholder=\"Search a game by Arabic or English name\" aria-label=\"Search\" /><button class=\"ds-search-btn\" type=\"submit\">Find a game</button></form>",
+      "css": ".ds-search{display:flex;align-items:center;gap:8px;width:100%;max-width:36rem;padding:6px 6px 6px 16px;border:1px solid var(--border,#e3e3df);border-radius:999px;background:var(--surface,#ffffff);box-shadow:0 4px 16px -6px rgba(20,21,26,0.08)}.ds-search-ic{width:20px;height:20px;color:var(--muted,#5b6070);flex:none}.ds-search-in{flex:1;min-width:0;height:40px;border:0;outline:none;background:transparent;font-family:inherit;font-size:14px;color:var(--foreground,#14151a)}.ds-search-in::placeholder{color:var(--muted,#5b6070)}.ds-search-btn{flex:none;height:40px;padding:0 18px;border:0;border-radius:999px;background:var(--accent,#6d28d9);color:#fff;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:background-color 150ms ease-out}.ds-search-btn:hover{background:var(--accent-hover,#5b21b6)}.ds-search:focus-within{border-color:var(--accent,#6d28d9)}"
+    },
+    {
+      "name": "Badge",
+      "kind": "chip",
+      "refersTo": "badge",
+      "description": "Pill chip marking the current moment — latest version, status, voted.",
+      "html": "<span class=\"ds-chip ds-chip-accent\">v1.2.0 · Latest version</span><span class=\"ds-chip ds-chip-neutral\">1,284 downloads</span>",
+      "css": ".ds-chip{display:inline-flex;align-items:center;gap:6px;padding:2px 10px;border-radius:999px;border:1px solid transparent;font-size:12px;font-weight:500;font-variant-numeric:tabular-nums;white-space:nowrap}.ds-chip-accent{background:var(--accent-soft,#f2ecfe);color:var(--accent,#6d28d9);border-color:transparent}.ds-chip-neutral{background:var(--surface-2,#f4f4f2);color:var(--muted,#5b6070);border-color:var(--border,#e3e3df)}"
+    },
+    {
+      "name": "Game Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "The catalogue shelf unit — 3:4 cover, version chip, pinned meta.",
+      "html": "<a class=\"ds-gcard\" href=\"#\"><span class=\"ds-gcover\"><img src=\"https://picsum.photos/seed/game/240/320\" alt=\"\" /><span class=\"ds-gver\">v1.2.0</span></span><span class=\"ds-gbody\"><span class=\"ds-gtitle\">Elden Ring</span><span class=\"ds-gmeta\"><svg class=\"ds-dl\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\"/><polyline points=\"7 10 12 15 17 10\"/><line x1=\"12\" y1=\"15\" x2=\"12\" y2=\"3\"/></svg>1,284</span></span></a>",
+      "css": ".ds-gcard{display:flex;flex-direction:column;overflow:hidden;border:1px solid var(--border,#e3e3df);border-radius:14px;background:var(--surface,#ffffff);text-decoration:none;color:inherit;transition:transform 200ms ease-out, box-shadow 200ms ease-out, border-color 150ms ease-out}.ds-gcard:hover{transform:translateY(-2px);box-shadow:0 10px 24px -8px rgba(24,26,41,0.14);border-color:var(--border-strong,#d2d2cc)}.ds-gcard:focus-visible{outline:2px solid var(--ring,#7c3aed);outline-offset:2px}.ds-gcover{position:relative;aspect-ratio:3/4;background:var(--surface-2,#f4f4f2);overflow:hidden}.ds-gcover img{width:100%;height:100%;object-fit:cover;transition:transform 300ms ease-out}.ds-gcard:hover .ds-gcover img{transform:scale(1.03)}.ds-gver{position:absolute;top:8px;inset-inline-start:8px;padding:2px 10px;border-radius:999px;background:color-mix(in oklab,var(--accent-soft,#f2ecfe) 85%, transparent);color:var(--accent,#6d28d9);font-size:12px;font-weight:500;font-variant-numeric:tabular-nums;backdrop-filter:blur(4px)}.ds-gbody{display:flex;flex:1;flex-direction:column;gap:8px;padding:12px 14px}.ds-gtitle{font-size:14px;font-weight:600;line-height:1.4;color:var(--foreground,#14151a);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.ds-gcard:hover .ds-gtitle{color:var(--accent,#6d28d9)}.ds-gmeta{margin-top:auto;display:flex;align-items:center;gap:4px;font-size:12px;color:var(--muted,#5b6070);font-variant-numeric:tabular-nums}.ds-dl{width:14px;height:14px}"
+    },
+    {
+      "name": "Nav Link",
+      "kind": "nav",
+      "refersTo": "button-secondary",
+      "description": "Quiet nav that turns violet when it marks the current page.",
+      "html": "<a class=\"ds-nav\" href=\"#\">Games</a><a class=\"ds-nav ds-nav-active\" href=\"#\" aria-current=\"page\">Dashboard</a>",
+      "css": ".ds-nav{display:inline-flex;align-items:center;gap:10px;padding:8px 14px;border-radius:10px;font-size:14px;font-weight:500;color:var(--muted,#5b6070);text-decoration:none;transition:background-color 150ms ease-out,color 150ms ease-out}.ds-nav:hover{background:var(--surface-2,#f4f4f2);color:var(--foreground,#14151a)}.ds-nav-active{background:var(--accent-soft,#f2ecfe);color:var(--accent,#6d28d9)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Bilingual Games Journal",
+    "overview": "ArgusArGames is a games catalogue that presents Arabic localizations with the composure of a sharp, well-set magazine rather than the dark-neon gaming default. Visitors land looking for one game and a fresh download; the interface removes friction — a working search leads every public page, covers carry the personality, and numbers read as calm data. Light is the committed first environment (paper-white, cool ink, one vivid violet accent), with a system-following dark theme as a first-class equal, not a degraded afterthought. The voice is confident but quiet: restraint in decoration, confidence in order. Both languages are equal citizens — Arabic-first, RTL and English LTR mirror correctly in component, grid, and microcopy.",
+    "keyCharacteristics": [
+      "Cool ink neutrals on paper; violet action accent; amber data accent.",
+      "Hairline line + tonal step separation; faint hover lift only.",
+      "One authored entrance (rise) per viewport; reduced-motion fully honored.",
+      "Tabular numerals on all counts and versions.",
+      "Cairo (Arabic) + Inter (Latin) pair, tuned tracking, max text measure ~65-75ch."
+    ],
+    "rules": [
+      { "name": "The One Accent Rule", "body": "Route Violet is used only where the visitor can do something — the primary action, a link, focus, active nav, a pressed vote. It never decorates. Its rarity is what makes \"download\" impossible to miss.", "section": "colors" },
+      { "name": "The Tabular Data Rule", "body": "Every count, version number, and date reads with tabular-nums, so columns of downloads and votes stay calm and comparable row to row.", "section": "colors" },
+      { "name": "The Search-First Rule", "body": "The first thing a returning visitor hits on the home page after the headline is the working search; wherever a catalogue appears, search and sort live above the grid, never below it.", "section": "layout" },
+      { "name": "The Line-Not-Shadow Rule", "body": "A flat surface at rest is separated by its hairline border. If a card floats, it is telling the visitor it can be acted on — keep that meaning rare and intentional.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do lead public views with the working search — it is the fastest path to the visitor's game.",
+      "Do keep violet scarce: it marks the action spot, nothing else.",
+      "Do render every count and version number with tabular numerals.",
+      "Do give both languages equal fidelity, including mirrored chevrons and layout via logical properties.",
+      "Do honor prefers-reduced-motion with the shared reduced-motion block."
+    ],
+    "donts": [
+      "Don't import dark-neon gaming tropes — glitch type, heavy gradients, or a neon glow palette.",
+      "Don't let cards rest on shadows; separation is a hairline at rest and lift only on press-ready states.",
+      "Don't use amber for interactive actions — it designates warm data (most-downloaded, warnings), while violet handles every action.",
+      "Don't break the 3:4 cover silhouette on catalogue cards.",
+      "Don't add more than one authored entrance animation per viewport."
+    ]
+  }
+}
