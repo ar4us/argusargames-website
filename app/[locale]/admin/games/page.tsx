@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { Link2, Plus } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { ConfirmDelete } from "@/components/admin/confirm-delete";
+import { DeleteGameButton } from "@/components/admin/confirm-delete";
 import { LogoMark } from "@/components/brand/logo";
 import { buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/card";
@@ -81,12 +81,7 @@ export default async function AdminGamesPage({
                   <Link2 className="hidden h-3.5 w-3.5 rtl:block" />
                   {t("edit")}
                 </Link>
-                <ConfirmDelete
-                  label={tc("delete")}
-                  onConfirm={async () => {
-                    await deleteGameAction(game.id, locale);
-                  }}
-                />
+                <DeleteGameButton gameId={game.id} locale={locale} />
               </div>
             </li>
           ))}

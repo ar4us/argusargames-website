@@ -1,7 +1,7 @@
 import { ArrowRight } from "lucide-react";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { ConfirmDelete } from "@/components/admin/confirm-delete";
+import { DeleteVersionButton } from "@/components/admin/confirm-delete";
 import { GameForm } from "@/components/admin/game-form";
 import { VersionForm } from "@/components/admin/version-form";
 import { Card, Badge } from "@/components/ui/card";
@@ -74,12 +74,7 @@ export default async function AdminEditGamePage({
                     <span className="tabular text-xs text-muted" dir="ltr">
                       ↓ {v.download_count}
                     </span>
-                    <ConfirmDelete
-                      label={tc("delete")}
-                      onConfirm={async () => {
-                        await deleteVersionAction(v.id, locale);
-                      }}
-                    />
+                    <DeleteVersionButton versionId={v.id} locale={locale} />
                   </li>
                 ))}
               </ul>
