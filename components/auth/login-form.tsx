@@ -34,8 +34,7 @@ export function LoginForm() {
         setLoading(false);
         return;
       }
-      router.push("/");
-      router.refresh();
+      window.location.href = `/${window.location.pathname.split("/")[1] || "ar"}`;
     } catch {
       setError(t("errors.unknown"));
       setLoading(false);

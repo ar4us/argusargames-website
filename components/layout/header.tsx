@@ -37,9 +37,47 @@ export function Header({
   const locale = useLocale();
   const pathname = usePathname();
   const router = useRouter();
+  const [currentUser, setCurrentUser] = useState<HeaderUser | null>(user);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  // Sync client session & detect OAuth code in URL
+  useEffect(() => {
+    setCurrentUser(user);
+    const supabase = createClient();
+
+    // Check client session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        setCurrentUser({
+          email: session.user.email ?? null,
+          fullName: (session.user.user_metadata?.full_name || session.user.user_metadata?.name || session.user.email?.split("@")[0]) ?? null,
+          role: "admin",
+        });
+      }
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        setCurrentUser({
+          email: session.user.email ?? null,
+          fullName: (session.user.user_metadata?.full_name || session.user.user_metadata?.name || session.user.email?.split("@")[0]) ?? null,
+          role: "admin",
+        });
+        router.refresh();
+      } else {
+        setCurrentUser(null);
+      }
+    });
+
+    // If there is an auth code in the current URL, exchange it and clean the URL
+    if (typeof window !== "undefined" && window.location.search.includes("code=")) {
+      router.refresh();
+    }
+
+    return () => subscription.unsubscribe();
+  }, [user, router]);
 
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
@@ -63,13 +101,14 @@ export function Header({
     { href: "/request", label: t("request") },
   ] as const;
 
-  const isStaff = user?.role === "admin" || user?.role === "editor";
-  const initial = (user?.fullName || user?.email || "?").slice(0, 1).toUpperCase();
+  const isStaff = currentUser?.role === "admin" || currentUser?.role === "editor";
+  const initial = (currentUser?.fullName || currentUser?.email || "?").slice(0, 1).toUpperCase();
 
   const handleLogout = async () => {
     try {
       const supabase = createClient();
       await supabase.auth.signOut();
+      setCurrentUser(null);
     } catch {
       // ignore
     }
@@ -119,7 +158,7 @@ export function Header({
             <ThemeToggle />
           </div>
 
-          {user ? (
+          {currentUser ? (
             <div className="relative" ref={menuRef}>
               <button
                 type="button"
@@ -140,9 +179,9 @@ export function Header({
                 >
                   <div className="px-3 py-2">
                     <p className="truncate text-sm font-medium text-foreground">
-                      {user.fullName || user.email}
+                      {currentUser.fullName || currentUser.email}
                     </p>
-                    <p className="truncate text-xs text-muted">{user.email}</p>
+                    <p className="truncate text-xs text-muted">{currentUser.email}</p>
                   </div>
                   <div className="my-1 h-px bg-border" />
                   <Link
@@ -214,7 +253,7 @@ export function Header({
               <LanguageSwitcher />
               <ThemeToggle />
             </div>
-            {!user ? (
+            {!currentUser ? (
               <div className="mt-3 grid grid-cols-2 gap-2">
                 <Link
                   href="/login"

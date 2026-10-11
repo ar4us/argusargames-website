@@ -45,8 +45,7 @@ export function RegisterForm() {
         return;
       }
       if (data.session) {
-        router.push("/");
-        router.refresh();
+        window.location.href = `/${locale}`;
         return;
       }
       setMessage(t("checkEmail"));

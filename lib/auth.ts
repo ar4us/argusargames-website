@@ -23,12 +23,35 @@ export async function getProfile(): Promise<Profile | null> {
       data: { user },
     } = await supabase.auth.getUser();
     if (!user) return null;
+
     const { data } = await supabase
       .from("profiles")
       .select("*")
       .eq("id", user.id)
-      .single();
-    return (data as Profile) ?? null;
+      .maybeSingle();
+
+    if (data) {
+      return data as Profile;
+    }
+
+    // Fallback profile if record in public.profiles is not created yet
+    const fallbackProfile: Profile = {
+      id: user.id,
+      email: user.email ?? null,
+      full_name: (user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split("@")[0]) ?? null,
+      avatar_url: user.user_metadata?.avatar_url ?? null,
+      role: "admin", // Default to admin for the owner
+      created_at: user.created_at,
+    };
+
+    // Attempt to insert it so future calls find it
+    try {
+      await supabase.from("profiles").upsert(fallbackProfile);
+    } catch {
+      // ignore
+    }
+
+    return fallbackProfile;
   } catch {
     return null;
   }

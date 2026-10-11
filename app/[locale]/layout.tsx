@@ -5,6 +5,7 @@ import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
+import { AuthListener } from "@/components/auth/auth-listener";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { ThemeScript } from "@/components/providers/theme-script";
 import { getProfile } from "@/lib/auth";
@@ -86,6 +87,7 @@ export default async function LocaleLayout({
         <NextIntlClientProvider messages={messages}>
           <ThemeProvider>
             <Header user={user} brandName={settings.site_name_en} />
+            <AuthListener />
             <main className="flex-1">{children}</main>
             <Footer settings={settings} />
           </ThemeProvider>
