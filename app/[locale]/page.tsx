@@ -10,7 +10,6 @@ import {
 import Image from "next/image";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { GameCard } from "@/components/games/game-card";
-import { PlatformChips } from "@/components/games/platform-chips";
 import { HeroSearch } from "@/components/home/hero-search";
 import { LogoMark } from "@/components/brand/logo";
 import { buttonVariants } from "@/components/ui/button";
@@ -145,11 +144,6 @@ export default async function HomePage({
               <span>{tc("viewAll")}</span>
               <ArrowRight className="h-4 w-4 rtl:rotate-180" />
             </Link>
-          </div>
-
-          {/* Clean Platform Filter Bar */}
-          <div className="mb-6">
-            <PlatformChips />
           </div>
 
           {latest.length > 0 ? (
