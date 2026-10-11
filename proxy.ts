@@ -38,6 +38,6 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Skip API routes, Next internals and static files.
-  matcher: ["/((?!api|_next|_vercel|.*\\..*).*)"],
+  // Skip API routes, auth callback, Next internals and static files.
+  matcher: ["/((?!api|auth|_next|_vercel|.*\\..*).*)"],
 };
