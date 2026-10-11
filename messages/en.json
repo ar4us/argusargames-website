@@ -6,7 +6,11 @@
   "nav": {
     "home": "Home",
     "games": "Games",
-    "request": "Request a localization",
+    "patches": "Patches",
+    "tools": "Tools",
+    "tutorials": "Tutorials",
+    "about": "About",
+    "request": "Request",
     "login": "Sign in",
     "register": "Create account",
     "profile": "My profile",

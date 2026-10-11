@@ -100,6 +100,10 @@ export function Header({
   const navItems = [
     { href: "/", label: t("home") },
     { href: "/games", label: t("games") },
+    { href: "/games", label: t("patches") },
+    { href: "/tools", label: t("tools") },
+    { href: "/tutorials", label: t("tutorials") },
+    { href: "/about", label: t("about") },
     { href: "/request", label: t("request") },
     ...(isStaff ? [{ href: "/admin", label: t("admin") }] : []),
   ] as const;
