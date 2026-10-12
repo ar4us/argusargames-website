@@ -6,7 +6,7 @@ interface SupportWidgetProps {
   coffeeUrl?: string;
 }
 
-export function SupportWidget({ coffeeUrl = "https://buymeacoffee.com/argusos" }: SupportWidgetProps) {
+export function SupportWidget({ coffeeUrl = "https://buymeacoffee.com/WM1WWktkGF" }: SupportWidgetProps) {
   return (
     <section className="overflow-hidden rounded-2xl border border-amber-500/20 bg-gradient-to-br from-amber-500/5 via-surface to-surface p-6 sm:p-8 shadow-xs">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
