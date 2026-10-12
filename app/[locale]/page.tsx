@@ -49,7 +49,7 @@ export default async function HomePage({
   const tc = await getTranslations("common");
 
   const [latest, popular, stats] = await Promise.all([
-    getLatestGames(8),
+    getLatestGames(12),
     getMostDownloaded(5),
     getStats(),
   ]);
