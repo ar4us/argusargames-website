@@ -7,22 +7,15 @@ import type { FormState } from "@/lib/action-types";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { slugify } from "@/lib/utils";
 import type { RequestStatus } from "@/lib/types";
+import { getProfile } from "@/lib/auth";
 
 async function staffGuard() {
   if (!isSupabaseConfigured()) return null;
+  const profile = await getProfile();
+  if (!profile) return null;
+  if (profile.role !== "admin" && profile.role !== "editor") return null;
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return null;
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
-  const role = profile?.role as string | undefined;
-  if (role !== "admin" && role !== "editor") return null;
-  return { supabase };
+  return { supabase, profile };
 }
 
 function revalidateSite(locale: string) {

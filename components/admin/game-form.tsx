@@ -635,7 +635,17 @@ export function GameForm({
       </div>
 
       <FieldError>
-        {state.ok ? null : state.error ? (state.error === "unknown" ? tc("error") : state.error) : null}
+        {state.ok
+          ? null
+          : state.error
+          ? state.error === "forbidden"
+            ? "غير مسموح: ليس لديك صلاحية مدير أو محرر، أو انتهت جلستك. يرجى تسجيل الدخول مجددًا كمدير."
+            : state.error === "required"
+            ? "يرجى ملء جميع الحقول المطلوبة (اسم اللعبة بالعربية والإنجليزية)."
+            : state.error === "unknown"
+            ? tc("error")
+            : state.error
+          : null}
       </FieldError>
 
       {state.ok && (
