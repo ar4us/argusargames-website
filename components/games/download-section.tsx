@@ -20,6 +20,14 @@ export function DownloadSection({
   locale,
 }: DownloadSectionProps) {
   const latestVersion = versions[0];
+  let versionFileSize = "";
+  if (latestVersion?.notes_en && latestVersion.notes_en.startsWith("{")) {
+    try {
+      const parsed = JSON.parse(latestVersion.notes_en);
+      if (parsed.fileSize) versionFileSize = parsed.fileSize;
+    } catch {}
+  }
+  const displayFileSize = versionFileSize || extra.fileSize || "غير محدد";
 
   return (
     <section id="download-section" className="space-y-6">
@@ -40,7 +48,7 @@ export function DownloadSection({
                   {latestVersion ? `الإصدار v${latestVersion.version}` : "الإصدار v1.0"}
                 </span>
                 <span className="rounded-md bg-surface-2 px-2.5 py-1 text-xs font-medium text-muted">
-                  الحجم: {extra.fileSize}
+                  الحجم: {displayFileSize}
                 </span>
                 <span className="rounded-md bg-surface-2 px-2.5 py-1 text-xs font-medium text-muted">
                   المنصة: PC (Windows)
@@ -102,7 +110,7 @@ export function DownloadSection({
             <div className="rounded-xl bg-surface-2/60 p-3">
               <span className="text-muted block font-medium">حجم التحميل</span>
               <span className="text-foreground font-bold mt-0.5 block">
-                {extra.fileSize}
+                {displayFileSize}
               </span>
             </div>
             <div className="rounded-xl bg-surface-2/60 p-3">

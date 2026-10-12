@@ -1,6 +1,6 @@
 "use client";
 
-import { Trash2, Upload, Plus, Image as ImageIcon, Film, Gamepad2, Sparkles, CheckCircle2, AlertCircle } from "lucide-react";
+import { Trash2, Upload, Plus, Image as ImageIcon, Film, Gamepad2, Sparkles, CheckCircle2, AlertCircle, Download, Terminal, Wrench } from "lucide-react";
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { useActionState, useRef, useState } from "react";
@@ -127,6 +127,24 @@ export function GameForm({
   const [highlights, setHighlights] = useState(
     extra?.highlights ? extra.highlights.join("\n") : ""
   );
+
+  // Patch Details & Technical Specifications
+  const [fileSize, setFileSize] = useState(extra?.fileSize ?? "20 ميغابايت");
+  const [patchType, setPatchType] = useState(extra?.patchType ?? "استبدال ملفات اللعبة");
+  const [status, setStatus] = useState(extra?.status ?? "مكتمل 100%");
+  const [compatibilityNotes, setCompatibilityNotes] = useState(
+    extra?.compatibilityNotes ?? "متوافق مع أحدث إصدارات اللعبة على نظام Windows (PC)."
+  );
+  const [installStepsText, setInstallStepsText] = useState(() => {
+    if (extra?.installSteps && extra.installSteps.length > 0) {
+      return extra.installSteps
+        .map((s) => `${s.title}: ${s.description}`)
+        .join("\n");
+    }
+    return `تحميل الباتش: فك الضغط عن ملف الباتش المضغوط.
+استبدال الملفات: انقل ملفات التعريب إلى مجلد اللعبة الرئيسي.
+التشغيل: شغل اللعبة واستمتع بالتجربة باللغة العربية.`;
+  });
 
   // Upload cover image
   const handleCoverUpload = async (file: File) => {
@@ -485,6 +503,105 @@ export function GameForm({
           <p className="text-xs text-muted">
             اكتب ميزة واحدة في كل سطر. ستظهر برمز الألماسة الذهبية 🔶 في صفحة اللعبة.
           </p>
+        </div>
+      </div>
+
+      {/* =========================================================================
+          5. PATCH DOWNLOAD & INSTALLATION DETAILS (DYNAMICS)
+         ========================================================================= */}
+      <div className="rounded-2xl border border-border bg-surface p-4 sm:p-5 space-y-5">
+        <div className="border-b border-border pb-3 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Wrench className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+            <h3 className="text-sm font-bold text-foreground">
+              معلومات الباتش والتحميل وطريقة التثبيت خطوة بخطوة
+            </h3>
+          </div>
+          <span className="text-xs text-muted">تظهر في بطاقة التحميل الرئيسية</span>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-3">
+          <div>
+            <Label htmlFor="file_size">حجم ملف التعريب / التحميل</Label>
+            <Input
+              id="file_size"
+              name="file_size"
+              value={fileSize}
+              onChange={(e) => setFileSize(e.target.value)}
+              placeholder="مثال: 89 ميغابايت أو 1.2 جيجابايت"
+              dir="rtl"
+            />
+            <p className="mt-1 text-[11px] text-muted">
+              يظهر في صندوق التحميل وبطاقة مواصفات الباتش.
+            </p>
+          </div>
+
+          <div>
+            <Label htmlFor="status">حالة التعريب</Label>
+            <Input
+              id="status"
+              name="status"
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              placeholder="مثال: مكتمل 100% أو نسخة تجريبية"
+              dir="rtl"
+            />
+            <p className="mt-1 text-[11px] text-muted">
+              مثال: مكتمل 100%، قيد التطوير، تجريبي...
+            </p>
+          </div>
+
+          <div>
+            <Label htmlFor="patch_type">نوع التثبيت</Label>
+            <Input
+              id="patch_type"
+              name="patch_type"
+              value={patchType}
+              onChange={(e) => setPatchType(e.target.value)}
+              placeholder="مثال: استبدال ملفات اللعبة أو مثبت تلقائي"
+              dir="rtl"
+            />
+            <p className="mt-1 text-[11px] text-muted">
+              مثال: حزمة استبدال ملفات اللعبة، باتش EXE...
+            </p>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <Terminal className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+            <Label htmlFor="install_steps" className="font-bold">
+              طريقة التثبيت خطوة بخطوة (عنوان الخطوة: الشرح)
+            </Label>
+          </div>
+          <Textarea
+            id="install_steps"
+            name="install_steps"
+            value={installStepsText}
+            onChange={(e) => setInstallStepsText(e.target.value)}
+            rows={5}
+            dir="rtl"
+            className="leading-relaxed font-mono text-xs"
+            placeholder={`اكتب كل خطوة في سطر بالشكل (العنوان: الشرح)، مثال:
+تحميل الباتش: حمّل ملف الباتش المضغوط وفك الضغط عنه.
+استبدال الملفات: انقل الملفات إلى مجلد اللعبة الرئيسي داخل Content/Paks.
+التشغيل: شغل اللعبة واستمتع بالتجربة باللغة العربية.`}
+          />
+          <p className="text-[11px] text-muted">
+            تنسيق: <span className="font-bold">العنوان: الشرح</span> في كل سطر. يتم ترقيم الخطوات تلقائياً (1، 2، 3...).
+          </p>
+        </div>
+
+        <div>
+          <Label htmlFor="compatibility_notes">ملاحظات التوافقية (شريط التنبيه السفلي)</Label>
+          <Input
+            id="compatibility_notes"
+            name="compatibility_notes"
+            value={compatibilityNotes}
+            onChange={(e) => setCompatibilityNotes(e.target.value)}
+            placeholder="مثال: متوافق مع أحدث إصدارات اللعبة على نظام Windows (PC)."
+            dir="rtl"
+          />
         </div>
       </div>
 

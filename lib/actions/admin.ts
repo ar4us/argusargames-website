@@ -71,11 +71,31 @@ export async function saveGameAction(
       : [];
   }
 
-  // Extract clean YouTube video ID if URL is provided
-  let youtubeId = "";
-  if (trailerUrl) {
-    const match = trailerUrl.match(/(?:youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=)([^#&?]*)/);
-    youtubeId = match && match[1] && match[1].length === 11 ? match[1] : trailerUrl;
+  const patchType = String(formData.get("patch_type") ?? "").trim() || "استبدال ملفات اللعبة";
+  const status = String(formData.get("status") ?? "").trim() || "مكتمل 100%";
+  const fileSize = String(formData.get("file_size") ?? "").trim();
+  const compatibilityNotes = String(formData.get("compatibility_notes") ?? "").trim();
+
+  // Parse install steps from formatted textarea (one step per line: عنوان: شرح)
+  const installStepsRaw = String(formData.get("install_steps") ?? "").trim();
+  let installSteps: { step: number; title: string; description: string }[] = [];
+  if (installStepsRaw) {
+    const lines = installStepsRaw.split("\n").map((l) => l.trim()).filter(Boolean);
+    installSteps = lines.map((line, idx) => {
+      const parts = line.split(":");
+      if (parts.length > 1) {
+        return {
+          step: idx + 1,
+          title: parts[0].trim(),
+          description: parts.slice(1).join(":").trim(),
+        };
+      }
+      return {
+        step: idx + 1,
+        title: `الخطوة ${idx + 1}`,
+        description: line,
+      };
+    });
   }
 
   const metaPayload = {
@@ -86,11 +106,16 @@ export async function saveGameAction(
     genre,
     platforms: platforms || "PC",
     officialUrl,
-    trailerYoutubeId: youtubeId,
-    trailerUrl,
+    trailerYoutubeId: "",
+    trailerUrl: "",
     aboutGame,
     highlights,
     screenshots,
+    fileSize,
+    patchType,
+    status,
+    installSteps: installSteps.length > 0 ? installSteps : undefined,
+    compatibilityNotes: compatibilityNotes || undefined,
   };
 
   const payload = {
@@ -145,12 +170,13 @@ export async function saveGameAction(
           publisher: publisher || developer || "ناشر مستقل",
           platforms: platforms || "PC",
           official_url: officialUrl || steamUrl || "",
-          trailer_youtube_id: youtubeId,
+          trailer_youtube_id: "",
           cover_url: coverUrl || `/images/covers/${slug}.jpg`,
           download_url: "",
           version: "1.0",
-          file_size: "20 ميغابايت",
-          status: "مكتمل 100%",
+          file_size: fileSize || "غير محدد",
+          patch_type: patchType,
+          status: status,
           about_game: aboutGame || "",
           highlights: highlights.length > 0 ? highlights : [
             "تعريب كامل لكافة القوائم والحوارات والنصوص",
@@ -158,11 +184,12 @@ export async function saveGameAction(
             "متوافق مع أحدث التحديثات الرسمية على الحاسب الشخصي PC"
           ],
           screenshots: screenshots,
-          install_steps: [
+          install_steps: installSteps.length > 0 ? installSteps : [
             { step: 1, title: "تحميل الباتش", description: "فك الضغط عن ملف الباتش المضغوط." },
             { step: 2, title: "استبدال الملفات", description: "انقل ملفات التعريب إلى مجلد اللعبة الرئيسي." },
             { step: 3, title: "التشغيل", description: "شغل اللعبة واستمتع بالتجربة باللغة العربية." }
-          ]
+          ],
+          compatibility_notes: compatibilityNotes || "",
         };
 
         if (idx !== -1) {

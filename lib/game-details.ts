@@ -523,6 +523,7 @@ export function getGameExtra(slug: string, rawDescriptionEn?: string | null): Ga
         screenshots: Array.isArray(parsed.screenshots) && parsed.screenshots.length > 0 ? parsed.screenshots : base.screenshots,
         fileSize: parsed.fileSize || base.fileSize,
         patchType: parsed.patchType || base.patchType,
+        status: parsed.status || base.status,
         aboutGame: parsed.aboutGame || base.aboutGame,
         highlights: Array.isArray(parsed.highlights) && parsed.highlights.length > 0 ? parsed.highlights : base.highlights,
         installSteps: Array.isArray(parsed.installSteps) && parsed.installSteps.length > 0 ? parsed.installSteps : base.installSteps,
