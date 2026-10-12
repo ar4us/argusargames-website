@@ -6,10 +6,8 @@ import {
   ExternalLink,
   Gamepad2,
   Download,
-  CheckCircle2,
   Building2,
   Layers,
-  Sparkles,
   ArrowDown,
 } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
@@ -19,6 +17,7 @@ import { getGameBySlug, getGameVersions } from "@/lib/queries";
 import { alternates, absoluteUrl } from "@/lib/seo";
 import { formatNumber, getLocalized } from "@/lib/utils";
 import { getGameExtra } from "@/lib/game-details";
+import { GameOverviewSpec } from "@/components/games/game-overview-spec";
 import { GameTrailer } from "@/components/games/game-trailer";
 import { GameScreenshots } from "@/components/games/game-screenshots";
 import { DownloadSection } from "@/components/games/download-section";
@@ -67,13 +66,12 @@ export default async function GamePage({
 
   const versions = await getGameVersions(game.id);
   const title = getLocalized(game, "title", locale);
-  const description = getLocalized(game, "description", locale);
-  const extra = getGameExtra(game.slug);
+  const extra = getGameExtra(game.slug, game.description_en);
 
   return (
     <div className="pb-20">
       {/* =========================================================================
-          HERO & GAME INTRO (INSPIRED BY ARABICHESHAM.COM/GAMES/HADES)
+          HERO & GAME INTRO (INSPIRED BY ARABICHESHAM.COM)
          ========================================================================= */}
       <section className="relative overflow-hidden border-b border-border bg-gradient-to-b from-surface via-background to-background py-10 sm:py-16">
         {/* Ambient Blurred Backdrop */}
@@ -129,7 +127,7 @@ export default async function GamePage({
               </div>
             </div>
 
-            {/* Game Details */}
+            {/* Game Header Details */}
             <div className="flex flex-col justify-between">
               <div>
                 <span className="text-xs sm:text-sm font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
@@ -146,12 +144,12 @@ export default async function GamePage({
                 <div className="mt-6 flex flex-wrap items-center gap-2 text-xs">
                   <div className="rounded-lg border border-border bg-surface px-3 py-1.5 font-semibold text-foreground flex items-center gap-1.5 shadow-2xs">
                     <CalendarDays className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
-                    <span>سنة الإصدار: {extra.year}</span>
+                    <span>تاريخ الصدور: {extra.year}</span>
                   </div>
 
                   <div className="rounded-lg border border-border bg-surface px-3 py-1.5 font-semibold text-foreground flex items-center gap-1.5 shadow-2xs">
                     <Gamepad2 className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
-                    <span>المنصة: PC (Windows)</span>
+                    <span>المنصات: {extra.platforms || "PC"}</span>
                   </div>
 
                   <div className="rounded-lg border border-border bg-surface px-3 py-1.5 font-semibold text-foreground flex items-center gap-1.5 shadow-2xs">
@@ -161,33 +159,21 @@ export default async function GamePage({
 
                   <div className="rounded-lg border border-border bg-surface px-3 py-1.5 font-semibold text-foreground flex items-center gap-1.5 shadow-2xs">
                     <Layers className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
-                    <span>التصنيف: {extra.genre}</span>
+                    <span>النوع: {extra.genre}</span>
                   </div>
 
-                  {game.steam_url || extra.steamUrl ? (
+                  {(extra.officialUrl || game.steam_url || extra.steamUrl) ? (
                     <a
-                      href={game.steam_url || extra.steamUrl}
+                      href={extra.officialUrl || game.steam_url || extra.steamUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="rounded-lg border border-border bg-surface px-3 py-1.5 font-semibold text-blue-600 dark:text-blue-400 hover:border-blue-500/40 flex items-center gap-1.5 transition-colors shadow-2xs"
                     >
-                      <span>صفحة Steam</span>
+                      <span>الموقع الرسمي / Steam</span>
                       <ExternalLink className="h-3 w-3" />
                     </a>
                   ) : null}
                 </div>
-
-                {/* Description */}
-                {description && (
-                  <div className="mt-6">
-                    <h2 className="text-xs font-bold uppercase tracking-wider text-muted">
-                      نبذة عن اللعبة والتعريب
-                    </h2>
-                    <p className="mt-2 text-sm sm:text-base leading-relaxed text-foreground/90 whitespace-pre-line">
-                      {description}
-                    </p>
-                  </div>
-                )}
               </div>
 
               {/* Jump to download button */}
@@ -197,7 +183,7 @@ export default async function GamePage({
                   className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-bold text-white shadow-md shadow-blue-600/20 hover:bg-blue-500 transition-all duration-200 hover:scale-[1.02]"
                 >
                   <Download className="h-4 w-4" />
-                  <span>انتقل إلى رابط التحميل</span>
+                  <span>الانتقال إلى رابط التحميل</span>
                   <ArrowDown className="h-4 w-4" />
                 </a>
 
@@ -211,23 +197,30 @@ export default async function GamePage({
       </section>
 
       {/* =========================================================================
-          CONTENT BLOCKS: TRAILER, SCREENSHOTS, DOWNLOAD, SUPPORT & UPDATES
+          CONTENT BLOCKS: OVERVIEW & SPECS, TRAILER, SCREENSHOTS, DOWNLOAD & UPDATES
          ========================================================================= */}
-      <Container className="mt-12 space-y-16">
-        {/* 1. Official Video / Trailer */}
+      <Container className="mt-14 space-y-16">
+        {/* 1. About the Game, Key Highlights & Specifications (Exact layout of Hesham's site) */}
+        <GameOverviewSpec
+          game={game}
+          extra={extra}
+          locale={locale}
+        />
+
+        {/* 2. Official Video / Trailer */}
         <GameTrailer
           title={title}
           youtubeId={extra.trailerYoutubeId}
           coverUrl={game.cover_url}
         />
 
-        {/* 2. Arabic Localization Screenshots */}
+        {/* 3. Arabic Localization Screenshots */}
         <GameScreenshots
           title={title}
           screenshots={extra.screenshots}
         />
 
-        {/* 3. Download & Installation Instructions */}
+        {/* 4. Download & Installation Instructions */}
         <DownloadSection
           gameTitle={title}
           versions={versions}
@@ -235,13 +228,13 @@ export default async function GamePage({
           locale={locale}
         />
 
-        {/* 4. Support & Coffee Widget */}
+        {/* 5. Support & Coffee Widget */}
         <SupportWidget />
 
-        {/* 5. Updates & Community Channels */}
+        {/* 6. Updates & Community Channels */}
         <UpdatesTracker />
 
-        {/* 6. Community Free Request Banner */}
+        {/* 7. Community Free Request Banner */}
         <CommunityRequest />
       </Container>
     </div>

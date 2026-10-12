@@ -21,60 +21,82 @@ export function VersionForm({ gameId }: { gameId: string }) {
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="game_id" value={gameId} />
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <div>
-          <Label htmlFor="version">{t("version")}</Label>
+          <Label htmlFor="version">رقم الإصدار (Version) *</Label>
           <Input
             id="version"
             name="version"
             dir="ltr"
             className="text-left"
-            placeholder={t("versionPlaceholder")}
+            placeholder="مثال: v1.0 أو v1.5"
             required
           />
         </div>
+
+        <div>
+          <Label htmlFor="platform">المنصة المدعومة (Platform)</Label>
+          <Input
+            id="platform"
+            name="platform"
+            defaultValue="PC (Windows)"
+            placeholder="مثال: PC (Steam / Epic Games)"
+            dir="ltr"
+          />
+        </div>
+
+        <div>
+          <Label htmlFor="file_size">حجم الملف (File Size)</Label>
+          <Input
+            id="file_size"
+            name="file_size"
+            placeholder="مثال: 18 ميغابايت أو 85 MB"
+            dir="rtl"
+          />
+        </div>
+
         <div>
           <Label htmlFor="release_date">{t("releaseDate")}</Label>
           <Input id="release_date" name="release_date" type="date" />
         </div>
-        <div>
-          <Label htmlFor="download_url">{t("downloadUrl")}</Label>
+
+        <div className="sm:col-span-2">
+          <Label htmlFor="download_url">رابط تحميل الباتش (Download URL) *</Label>
           <Input
             id="download_url"
             name="download_url"
             type="url"
             dir="ltr"
             className="text-left"
+            placeholder="https://drive.google.com/... أو رابط مباشر"
             required
           />
         </div>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div>
-          <Label htmlFor="notes_ar">
-            {t("notesAr")} <span className="font-normal text-muted">({tc("optional")})</span>
-          </Label>
-          <Textarea id="notes_ar" name="notes_ar" dir="rtl" className="min-h-24" />
-        </div>
-        <div>
-          <Label htmlFor="notes_en">
-            {t("notesEn")} <span className="font-normal text-muted">({tc("optional")})</span>
-          </Label>
-          <Textarea id="notes_en" name="notes_en" dir="ltr" className="min-h-24 text-left" />
-        </div>
+      <div>
+        <Label htmlFor="notes_ar">
+          ملاحظات التعريب وطريقة التثبيت <span className="font-normal text-muted">({tc("optional")})</span>
+        </Label>
+        <Textarea
+          id="notes_ar"
+          name="notes_ar"
+          dir="rtl"
+          placeholder="اكتب هنا أي تعليمات لتثبيت هذا الإصدار أو التغييرات المضافة في هذا التحديث..."
+          className="min-h-24 leading-relaxed"
+        />
       </div>
 
       <FieldError>{state.ok ? null : state.error ? tc("error") : null}</FieldError>
       {state.ok ? (
-        <p className="rounded-[var(--radius-control)] bg-[color-mix(in_oklab,var(--success)_12%,transparent)] px-3.5 py-2.5 text-sm text-success">
-          {state.message === "created" ? t("created") : tc("save")}
+        <p className="rounded-xl bg-emerald-500/10 border border-emerald-500/20 px-3.5 py-2.5 text-sm font-semibold text-emerald-600 dark:text-emerald-400">
+          تمت إضافة إصدار التعريب بنجاح!
         </p>
       ) : null}
 
-      <Button type="submit" disabled={pending}>
+      <Button type="submit" disabled={pending} className="min-w-28">
         {pending ? <Spinner /> : null}
-        {t("add")}
+        إضافة الإصدار
       </Button>
     </form>
   );

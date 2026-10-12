@@ -43,7 +43,6 @@ export async function saveGameAction(
   const titleAr = String(formData.get("title_ar") ?? "").trim();
   const titleEn = String(formData.get("title_en") ?? "").trim();
   const descriptionAr = String(formData.get("description_ar") ?? "").trim();
-  const descriptionEn = String(formData.get("description_en") ?? "").trim();
   const coverUrl = String(formData.get("cover_url") ?? "").trim();
   const steamUrl = String(formData.get("steam_url") ?? "").trim();
   const published = formData.get("published") === "on";
@@ -52,14 +51,61 @@ export async function saveGameAction(
   if (!titleAr || !titleEn) return { ok: false, error: "required" };
   if (!slug) slug = `game-${Date.now()}`;
 
+  // Custom metadata fields (Specifications matching Hesham's site)
+  const knownAs = String(formData.get("known_as") ?? "").trim();
+  const developer = String(formData.get("developer") ?? "").trim();
+  const publisher = String(formData.get("publisher") ?? "").trim();
+  const year = String(formData.get("release_year") ?? "").trim();
+  const genre = String(formData.get("genre") ?? "").trim();
+  const platforms = String(formData.get("platforms") ?? "").trim();
+  const officialUrl = String(formData.get("official_url") ?? "").trim() || steamUrl;
+  const trailerUrl = String(formData.get("trailer_url") ?? "").trim();
+  const aboutGame = String(formData.get("about_game") ?? "").trim() || descriptionAr;
+  const highlightsRaw = String(formData.get("highlights") ?? "").trim();
+  const highlights = highlightsRaw
+    ? highlightsRaw.split("\n").map((s) => s.trim()).filter(Boolean)
+    : [];
+
+  const screenshotsRaw = String(formData.get("screenshots") ?? "").trim();
+  let screenshots: string[] = [];
+  try {
+    screenshots = screenshotsRaw ? JSON.parse(screenshotsRaw) : [];
+  } catch {
+    screenshots = screenshotsRaw
+      ? screenshotsRaw.split(",").map((s) => s.trim()).filter(Boolean)
+      : [];
+  }
+
+  // Extract clean YouTube video ID if URL is provided
+  let youtubeId = "";
+  if (trailerUrl) {
+    const match = trailerUrl.match(/(?:youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=)([^#&?]*)/);
+    youtubeId = match && match[1] && match[1].length === 11 ? match[1] : trailerUrl;
+  }
+
+  const metaPayload = {
+    knownAs,
+    developer,
+    publisher,
+    year,
+    genre,
+    platforms: platforms || "PC",
+    officialUrl,
+    trailerYoutubeId: youtubeId,
+    trailerUrl,
+    aboutGame,
+    highlights,
+    screenshots,
+  };
+
   const payload = {
     slug,
     title_ar: titleAr,
     title_en: titleEn,
-    description_ar: descriptionAr || null,
-    description_en: descriptionEn || null,
+    description_ar: aboutGame || null,
+    description_en: JSON.stringify(metaPayload),
     cover_url: coverUrl || null,
-    steam_url: steamUrl || null,
+    steam_url: steamUrl || officialUrl || null,
     published,
   };
 
@@ -70,6 +116,7 @@ export async function saveGameAction(
       return { ok: false, error: "unknown" };
     }
     revalidateSite(locale);
+    revalidatePath(`/${locale}/games/${slug}`);
     return { ok: true, message: "updated" };
   }
 
@@ -82,6 +129,7 @@ export async function saveGameAction(
   if (error) return { ok: false, error: "unknown" };
 
   revalidateSite(locale);
+  revalidatePath(`/${locale}/games/${slug}`);
   return { ok: true, message: "created" };
 }
 
@@ -112,16 +160,24 @@ export async function saveVersionAction(
   const notesAr = String(formData.get("notes_ar") ?? "").trim();
   const notesEn = String(formData.get("notes_en") ?? "").trim();
   const downloadUrl = String(formData.get("download_url") ?? "").trim();
+  const platform = String(formData.get("platform") ?? "").trim();
+  const fileSize = String(formData.get("file_size") ?? "").trim();
 
   if (!gameId || !version || !downloadUrl)
     return { ok: false, error: "required" };
+
+  const versionMeta = {
+    platform: platform || "PC (Windows)",
+    fileSize: fileSize || "",
+    notes: notesEn,
+  };
 
   const { error } = await supabase.from("versions").insert({
     game_id: gameId,
     version,
     release_date: releaseDate || null,
     notes_ar: notesAr || null,
-    notes_en: notesEn || null,
+    notes_en: JSON.stringify(versionMeta),
     download_url: downloadUrl,
   });
   if (error) return { ok: false, error: "unknown" };
