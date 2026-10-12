@@ -18,7 +18,6 @@ import { alternates, absoluteUrl } from "@/lib/seo";
 import { formatNumber, getLocalized } from "@/lib/utils";
 import { getGameExtra } from "@/lib/game-details";
 import { GameOverviewSpec } from "@/components/games/game-overview-spec";
-import { GameTrailer } from "@/components/games/game-trailer";
 import { GameScreenshots } from "@/components/games/game-screenshots";
 import { DownloadSection } from "@/components/games/download-section";
 import { SupportWidget } from "@/components/games/support-widget";
@@ -207,14 +206,7 @@ export default async function GamePage({
           locale={locale}
         />
 
-        {/* 2. Official Video / Trailer */}
-        <GameTrailer
-          title={title}
-          youtubeId={extra.trailerYoutubeId}
-          coverUrl={game.cover_url}
-        />
-
-        {/* 3. Arabic Localization Screenshots */}
+        {/* 2. Arabic Localization Screenshots */}
         <GameScreenshots
           title={title}
           screenshots={extra.screenshots}

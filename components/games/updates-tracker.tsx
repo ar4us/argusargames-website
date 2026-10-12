@@ -1,7 +1,7 @@
 "use client";
 
 import { Bell, ExternalLink } from "lucide-react";
-import { FaDiscord, FaXTwitter, FaTelegram, FaYoutube } from "react-icons/fa6";
+import { FaDiscord, FaXTwitter, FaTelegram, FaRedditAlien } from "react-icons/fa6";
 
 export function UpdatesTracker() {
   const channels = [
@@ -30,12 +30,12 @@ export function UpdatesTracker() {
       color: "hover:border-[#229ED9]/50 hover:bg-[#229ED9]/5 text-[#229ED9]",
     },
     {
-      name: "قناة YouTube",
-      label: "عروض اللعب والمراجعات",
-      description: "شاهد استعراضات التعريب ومقاطع أسلوب اللعب بالعربية",
-      href: "https://youtube.com/",
-      icon: FaYoutube,
-      color: "hover:border-[#FF0000]/50 hover:bg-[#FF0000]/5 text-[#FF0000]",
+      name: "مجتمع Reddit",
+      label: "نقاشات ومستجدات التعريب",
+      description: "شارك في النقاشات وطرح الأسئلة ومتابعة كل جديد",
+      href: "https://reddit.com/",
+      icon: FaRedditAlien,
+      color: "hover:border-[#FF4500]/50 hover:bg-[#FF4500]/5 text-[#FF4500]",
     },
   ];
 

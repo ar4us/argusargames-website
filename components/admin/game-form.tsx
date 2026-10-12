@@ -437,25 +437,6 @@ export function GameForm({
             />
           </div>
         </div>
-
-        <div>
-          <Label htmlFor="trailer_url">
-            رابط العرض الرسمي للتعريب (YouTube Trailer)
-          </Label>
-          <div className="relative">
-            <Input
-              id="trailer_url"
-              name="trailer_url"
-              value={trailerUrl}
-              onChange={(e) => setTrailerUrl(e.target.value)}
-              placeholder="مثال: https://www.youtube.com/watch?v=..."
-              dir="ltr"
-            />
-          </div>
-          <p className="mt-1 text-xs text-muted">
-            يمكنك وضع رابط الفيديو كاملاً على يوتيوب أو معرف الفيديو ليتم عرضه في مشغل 1080p الرسمي.
-          </p>
-        </div>
       </div>
 
       {/* =========================================================================
