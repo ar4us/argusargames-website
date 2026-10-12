@@ -34,13 +34,17 @@ export async function getProfile(): Promise<Profile | null> {
       return data as Profile;
     }
 
+    const email = user.email?.toLowerCase().trim() ?? "";
+    const isOwner = email === "argusargames@gmail.com" || email.startsWith("argusar");
+    const assignedRole = (user.user_metadata?.role as UserRole) || (isOwner ? "admin" : "user");
+
     // Fallback profile if record in public.profiles is not created yet
     const fallbackProfile: Profile = {
       id: user.id,
       email: user.email ?? null,
       full_name: (user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split("@")[0]) ?? null,
       avatar_url: user.user_metadata?.avatar_url ?? null,
-      role: "admin", // Default to admin for the owner
+      role: assignedRole,
       created_at: user.created_at,
     };
 

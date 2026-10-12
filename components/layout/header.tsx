@@ -47,17 +47,43 @@ export function Header({
     setCurrentUser(user);
     const supabase = createClient();
 
+    const fetchRoleAndSetUser = async (sessionUser: any) => {
+      const email = sessionUser.email?.toLowerCase().trim() ?? "";
+      const isOwner = email === "argusargames@gmail.com" || email.startsWith("argusar");
+
+      try {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", sessionUser.id)
+          .maybeSingle();
+
+        const role = (profile?.role as UserRole) || (isOwner ? "admin" : "user");
+        setCurrentUser({
+          email: sessionUser.email ?? null,
+          fullName:
+            (sessionUser.user_metadata?.full_name ||
+              sessionUser.user_metadata?.name ||
+              sessionUser.email?.split("@")[0]) ??
+            null,
+          role,
+        });
+      } catch {
+        setCurrentUser({
+          email: sessionUser.email ?? null,
+          fullName:
+            (sessionUser.user_metadata?.full_name ||
+              sessionUser.user_metadata?.name ||
+              sessionUser.email?.split("@")[0]) ??
+            null,
+          role: isOwner ? "admin" : "user",
+        });
+      }
+    };
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
-        setCurrentUser({
-          email: session.user.email ?? null,
-          fullName:
-            (session.user.user_metadata?.full_name ||
-              session.user.user_metadata?.name ||
-              session.user.email?.split("@")[0]) ??
-            null,
-          role: "admin",
-        });
+        void fetchRoleAndSetUser(session.user);
       }
     });
 
@@ -65,15 +91,7 @@ export function Header({
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
-        setCurrentUser({
-          email: session.user.email ?? null,
-          fullName:
-            (session.user.user_metadata?.full_name ||
-              session.user.user_metadata?.name ||
-              session.user.email?.split("@")[0]) ??
-            null,
-          role: "admin",
-        });
+        void fetchRoleAndSetUser(session.user);
         router.refresh();
       } else {
         setCurrentUser(null);
