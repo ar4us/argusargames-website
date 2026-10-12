@@ -19,6 +19,7 @@ import { formatNumber, getLocalized } from "@/lib/utils";
 import { getGameExtra } from "@/lib/game-details";
 import { GameOverviewSpec } from "@/components/games/game-overview-spec";
 import { GameScreenshots } from "@/components/games/game-screenshots";
+import { getUser } from "@/lib/auth";
 import { DownloadSection } from "@/components/games/download-section";
 import { SupportWidget } from "@/components/games/support-widget";
 import { UpdatesTracker } from "@/components/games/updates-tracker";
@@ -64,6 +65,7 @@ export default async function GamePage({
   if (!game) notFound();
 
   const versions = await getGameVersions(game.id);
+  const user = await getUser();
   const title = getLocalized(game, "title", locale);
   const extra = getGameExtra(game.slug, game.description_en);
 
@@ -218,6 +220,8 @@ export default async function GamePage({
           versions={versions}
           extra={extra}
           locale={locale}
+          isAuthenticated={Boolean(user)}
+          gameSlug={game.slug}
         />
 
         {/* 5. Support & Coffee Widget */}

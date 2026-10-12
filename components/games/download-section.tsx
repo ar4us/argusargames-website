@@ -6,11 +6,16 @@ import { DownloadButton } from "@/components/games/download-button";
 import type { GameExtraDetail } from "@/lib/game-details";
 import { formatDate } from "@/lib/utils";
 
+import { Link } from "@/i18n/navigation";
+import { LogIn } from "lucide-react";
+
 interface DownloadSectionProps {
   gameTitle: string;
   versions: GameVersion[];
   extra: GameExtraDetail;
   locale: string;
+  isAuthenticated?: boolean;
+  gameSlug?: string;
 }
 
 export function DownloadSection({
@@ -18,6 +23,8 @@ export function DownloadSection({
   versions,
   extra,
   locale,
+  isAuthenticated = false,
+  gameSlug,
 }: DownloadSectionProps) {
   const latestVersion = versions[0];
   let versionFileSize = "";
@@ -70,25 +77,35 @@ export function DownloadSection({
             </div>
 
             <div className="shrink-0 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-              {latestVersion ? (
-                <DownloadButton
-                  versionId={latestVersion.id}
-                  count={latestVersion.download_count}
-                  locale={locale}
-                  label="تحميل التعريب (رابط مباشر)"
-                  variant="primary"
-                  size="lg"
-                  showCount={true}
-                  className="w-full sm:w-auto shadow-md shadow-blue-600/20"
-                />
+              {isAuthenticated ? (
+                latestVersion ? (
+                  <DownloadButton
+                    versionId={latestVersion.id}
+                    count={latestVersion.download_count}
+                    locale={locale}
+                    label="تحميل التعريب (رابط مباشر)"
+                    variant="primary"
+                    size="lg"
+                    showCount={true}
+                    className="w-full sm:w-auto shadow-md shadow-blue-600/20"
+                  />
+                ) : (
+                  <a
+                    href="#download-section"
+                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3.5 text-sm font-bold text-white shadow-md hover:bg-blue-500 transition-colors"
+                  >
+                    <Download className="h-4 w-4" />
+                    تحميل التعريب
+                  </a>
+                )
               ) : (
-                <a
-                  href="#download-section"
-                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3.5 text-sm font-bold text-white shadow-md hover:bg-blue-500 transition-colors"
+                <Link
+                  href={`/login?redirectTo=${encodeURIComponent(`/${locale}/games/${gameSlug || ""}`)}`}
+                  className="inline-flex items-center justify-center gap-2.5 rounded-xl bg-blue-600 px-6 py-3.5 text-sm font-bold text-white shadow-md shadow-blue-600/20 hover:bg-blue-500 transition-all duration-200 hover:scale-[1.02]"
                 >
-                  <Download className="h-4 w-4" />
-                  تحميل التعريب
-                </a>
+                  <LogIn className="h-4 w-4" />
+                  <span>تسجيل الدخول للتحميل</span>
+                </Link>
               )}
             </div>
           </div>

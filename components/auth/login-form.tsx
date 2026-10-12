@@ -34,7 +34,13 @@ export function LoginForm() {
         setLoading(false);
         return;
       }
-      window.location.href = `/${window.location.pathname.split("/")[1] || "ar"}`;
+      const params = new URLSearchParams(window.location.search);
+      const redirectTo = params.get("redirectTo");
+      if (redirectTo && redirectTo.startsWith("/")) {
+        window.location.href = redirectTo;
+      } else {
+        window.location.href = `/${window.location.pathname.split("/")[1] || "ar"}`;
+      }
     } catch {
       setError(t("errors.unknown"));
       setLoading(false);

@@ -13,9 +13,30 @@ export async function GET(
   if (!isSupabaseConfigured()) return NextResponse.redirect(home);
 
   try {
+    const userClient = await createClient();
+    const {
+      data: { user },
+    } = await userClient.auth.getUser();
+
+    // If visitor is not authenticated, redirect them to login page with return url
+    if (!user) {
+      const referer = request.headers.get("referer");
+      let returnPath = "/";
+      if (referer) {
+        try {
+          const refUrl = new URL(referer);
+          returnPath = `${refUrl.pathname}${refUrl.search}`;
+        } catch {}
+      }
+      const locale = returnPath.startsWith("/en") ? "en" : "ar";
+      const loginUrl = new URL(`/${locale}/login`, request.url);
+      loginUrl.searchParams.set("redirectTo", returnPath);
+      return NextResponse.redirect(loginUrl);
+    }
+
     const supabase = process.env.SUPABASE_SERVICE_ROLE_KEY
       ? createAdminClient()
-      : await createClient();
+      : userClient;
 
     const { data } = await supabase
       .from("versions")
