@@ -105,7 +105,27 @@ export async function saveGameAction(
   };
 
   try {
-    // Sync to local data/games.json
+    // 1. Persist to Supabase Database
+    if (id) {
+      const { error } = await supabase.from("games").update(payload).eq("id", id);
+      if (error) {
+        console.error("Supabase update error:", error);
+        if (error.code === "23505") return { ok: false, error: "slug_taken" };
+        return { ok: false, error: error.message || "unknown" };
+      }
+    } else {
+      let { error } = await supabase.from("games").insert(payload);
+      if (error?.code === "23505") {
+        slug = `${slug}-${Math.random().toString(36).slice(2, 6)}`;
+        ({ error } = await supabase.from("games").insert({ ...payload, slug }));
+      }
+      if (error) {
+        console.error("Supabase insert error:", error);
+        return { ok: false, error: error.message || "unknown" };
+      }
+    }
+
+    // 2. Sync to local data/games.json if available
     try {
       const jsonPath = path.join(process.cwd(), "data", "games.json");
       if (fs.existsSync(jsonPath)) {
