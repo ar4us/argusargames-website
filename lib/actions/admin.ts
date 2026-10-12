@@ -109,28 +109,37 @@ export async function saveGameAction(
     published,
   };
 
-  if (id) {
-    const { error } = await supabase.from("games").update(payload).eq("id", id);
-    if (error) {
-      if (error.code === "23505") return { ok: false, error: "slug_taken" };
-      return { ok: false, error: "unknown" };
+  try {
+    if (id) {
+      const { error } = await supabase.from("games").update(payload).eq("id", id);
+      if (error) {
+        console.error("Supabase update error:", error);
+        if (error.code === "23505") return { ok: false, error: "slug_taken" };
+        return { ok: false, error: error.message || "unknown" };
+      }
+      revalidateSite(locale);
+      revalidatePath(`/${locale}/games/${slug}`);
+      return { ok: true, message: "updated" };
     }
+
+    let { error } = await supabase.from("games").insert(payload);
+    if (error?.code === "23505") {
+      // Slug collision: retry once with a short suffix.
+      slug = `${slug}-${Math.random().toString(36).slice(2, 6)}`;
+      ({ error } = await supabase.from("games").insert({ ...payload, slug }));
+    }
+    if (error) {
+      console.error("Supabase insert error:", error);
+      return { ok: false, error: error.message || "unknown" };
+    }
+
     revalidateSite(locale);
     revalidatePath(`/${locale}/games/${slug}`);
-    return { ok: true, message: "updated" };
+    return { ok: true, message: "created" };
+  } catch (err: any) {
+    console.error("saveGameAction exception:", err);
+    return { ok: false, error: err?.message || "unknown" };
   }
-
-  let { error } = await supabase.from("games").insert(payload);
-  if (error?.code === "23505") {
-    // Slug collision: retry once with a short suffix.
-    slug = `${slug}-${Math.random().toString(36).slice(2, 6)}`;
-    ({ error } = await supabase.from("games").insert({ ...payload, slug }));
-  }
-  if (error) return { ok: false, error: "unknown" };
-
-  revalidateSite(locale);
-  revalidatePath(`/${locale}/games/${slug}`);
-  return { ok: true, message: "created" };
 }
 
 export async function deleteGameAction(

@@ -16,8 +16,8 @@ interface ScreenshotItem {
   name?: string;
 }
 
-// Client-side image processor: compresses and resizes to high quality WebP/JPEG data URL
-async function processImageFile(file: File, maxWidth = 1600, quality = 0.82): Promise<{ url: string; name: string }> {
+// Client-side image processor: compresses and resizes to lightweight high quality WebP/JPEG data URL (~35KB-50KB)
+async function processImageFile(file: File, maxWidth = 960, quality = 0.70): Promise<{ url: string; name: string }> {
   return new Promise((resolve, reject) => {
     if (!file.type.startsWith("image/")) {
       reject(new Error("الملف المحدد ليس صورة صالحة"));
@@ -133,7 +133,7 @@ export function GameForm({
     setUploadingCover(true);
     setUploadError(null);
     try {
-      const processed = await processImageFile(file, 1400, 0.85);
+      const processed = await processImageFile(file, 960, 0.75);
       setCoverUrl(processed.url);
       setUploadNotice("تم تحديث غلاف اللعبة بنجاح");
       setTimeout(() => setUploadNotice(null), 4000);
@@ -154,7 +154,7 @@ export function GameForm({
     try {
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
-        const processed = await processImageFile(file, 1600, 0.82);
+        const processed = await processImageFile(file, 960, 0.70);
         newItems.push({
           url: processed.url,
           name: processed.name || `لقطة ${screenshots.length + i + 1}`,
@@ -596,7 +596,9 @@ export function GameForm({
         )}
       </div>
 
-      <FieldError>{state.ok ? null : state.error ? tc("error") : null}</FieldError>
+      <FieldError>
+        {state.ok ? null : state.error ? (state.error === "unknown" ? tc("error") : state.error) : null}
+      </FieldError>
 
       {state.ok && (
         <p className="rounded-xl bg-emerald-500/10 border border-emerald-500/20 px-4 py-3 text-sm font-semibold text-emerald-600 dark:text-emerald-400">
