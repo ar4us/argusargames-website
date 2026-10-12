@@ -43,6 +43,7 @@ export function GameScreenshots({ title, screenshots }: GameScreenshotsProps) {
               fill
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               className="object-cover transition-transform duration-500 group-hover:scale-105"
+              unoptimized={src.startsWith("data:")}
             />
             <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/20" />
             <div className="absolute bottom-2 start-2 rounded-md bg-black/70 px-2 py-0.5 text-[11px] font-medium text-white backdrop-blur-xs opacity-0 group-hover:opacity-100 transition-opacity">
@@ -107,6 +108,7 @@ export function GameScreenshots({ title, screenshots }: GameScreenshotsProps) {
               width={1600}
               height={900}
               className="max-h-[85vh] w-auto rounded-xl object-contain shadow-2xl"
+              unoptimized={screenshots[activeIdx]?.startsWith("data:")}
               priority
             />
           </div>

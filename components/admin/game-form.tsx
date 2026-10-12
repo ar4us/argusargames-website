@@ -1,18 +1,73 @@
 "use client";
 
-import { Trash2, Upload, Plus, Image as ImageIcon, Film, Gamepad2, Sparkles } from "lucide-react";
+import { Trash2, Upload, Plus, Image as ImageIcon, Film, Gamepad2, Sparkles, CheckCircle2, AlertCircle } from "lucide-react";
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { useActionState, useRef, useState } from "react";
-import imageCompression from "browser-image-compression";
 import { saveGameAction } from "@/lib/actions/admin";
-import { useRouter } from "@/i18n/navigation";
 import { initialFormState } from "@/lib/action-types";
 import { Button, Spinner } from "@/components/ui/button";
 import { Checkbox, FieldError, Input, Label, Textarea } from "@/components/ui/field";
-import { createClient } from "@/lib/supabase/client";
 import type { Game } from "@/lib/types";
 import { getGameExtra } from "@/lib/game-details";
+
+interface ScreenshotItem {
+  url: string;
+  name?: string;
+}
+
+// Client-side image processor: compresses and resizes to high quality WebP/JPEG data URL
+async function processImageFile(file: File, maxWidth = 1600, quality = 0.82): Promise<{ url: string; name: string }> {
+  return new Promise((resolve, reject) => {
+    if (!file.type.startsWith("image/")) {
+      reject(new Error("الملف المحدد ليس صورة صالحة"));
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const result = e.target?.result as string;
+      const img = document.createElement("img");
+      img.onload = () => {
+        try {
+          const canvas = document.createElement("canvas");
+          let width = img.width;
+          let height = img.height;
+
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          if (!ctx) {
+            resolve({ url: result, name: file.name });
+            return;
+          }
+
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // Try WebP first, fallback to JPEG
+          try {
+            const webpData = canvas.toDataURL("image/webp", quality);
+            resolve({ url: webpData, name: file.name });
+          } catch {
+            const jpegData = canvas.toDataURL("image/jpeg", quality);
+            resolve({ url: jpegData, name: file.name });
+          }
+        } catch {
+          resolve({ url: result, name: file.name });
+        }
+      };
+      img.onerror = () => resolve({ url: result, name: file.name });
+      img.src = result;
+    };
+    reader.onerror = () => reject(new Error("تعذر قراءة ملف الصورة من جهازك"));
+    reader.readAsDataURL(file);
+  });
+}
 
 export function GameForm({
   game,
@@ -37,12 +92,19 @@ export function GameForm({
   const [coverUrl, setCoverUrl] = useState(game?.cover_url ?? "");
   const [uploadingCover, setUploadingCover] = useState(false);
 
-  // Screenshots state
-  const [screenshots, setScreenshots] = useState<string[]>(
-    extra?.screenshots && extra.screenshots.length > 0 ? extra.screenshots : []
-  );
+  // Screenshots state with names
+  const [screenshots, setScreenshots] = useState<ScreenshotItem[]>(() => {
+    if (!extra?.screenshots || extra.screenshots.length === 0) return [];
+    return extra.screenshots.map((s, idx) => ({
+      url: s,
+      name: s.startsWith("data:") ? `لقطة ${idx + 1}` : s.split("/").pop() || `لقطة ${idx + 1}`,
+    }));
+  });
+
   const [screenshotInputUrl, setScreenshotInputUrl] = useState("");
   const [uploadingScreenshot, setUploadingScreenshot] = useState(false);
+  const [uploadNotice, setUploadNotice] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   // Specifications
   const [knownAs, setKnownAs] = useState(extra?.knownAs ?? "");
@@ -67,77 +129,59 @@ export function GameForm({
   );
 
   // Upload cover image
-  const uploadCover = async (file: File) => {
+  const handleCoverUpload = async (file: File) => {
     setUploadingCover(true);
+    setUploadError(null);
     try {
-      const supabase = createClient();
-      const compressed = await imageCompression(file, {
-        maxSizeMB: 1,
-        maxWidthOrHeight: 1200,
-        useWebWorker: true,
-      });
-      const safeName = file.name
-        .replace(/[^a-zA-Z0-9._-]/g, "_")
-        .toLowerCase()
-        .slice(-40);
-      const path = `games/${Date.now()}-${safeName}`;
-      const { data, error } = await supabase.storage
-        .from("covers")
-        .upload(path, compressed, {
-          contentType: file.type || "image/jpeg",
-          upsert: false,
-          cacheControl: "31536000",
-        });
-      if (error) throw error;
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from("covers").getPublicUrl(data.path);
-      setCoverUrl(publicUrl);
-    } catch (err) {
-      console.error("cover upload failed", err);
+      const processed = await processImageFile(file, 1400, 0.85);
+      setCoverUrl(processed.url);
+      setUploadNotice("تم تحديث غلاف اللعبة بنجاح");
+      setTimeout(() => setUploadNotice(null), 4000);
+    } catch (err: any) {
+      setUploadError(err?.message || "فشل معالجة صورة الغلاف");
     } finally {
       setUploadingCover(false);
     }
   };
 
-  // Upload localization screenshot
-  const uploadScreenshot = async (file: File) => {
+  // Upload localization screenshots (supports multiple files)
+  const handleScreenshotUpload = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
     setUploadingScreenshot(true);
+    setUploadError(null);
+
+    const newItems: ScreenshotItem[] = [];
     try {
-      const supabase = createClient();
-      const compressed = await imageCompression(file, {
-        maxSizeMB: 1.5,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
-      });
-      const safeName = file.name
-        .replace(/[^a-zA-Z0-9._-]/g, "_")
-        .toLowerCase()
-        .slice(-40);
-      const path = `screenshots/${Date.now()}-${safeName}`;
-      const { data, error } = await supabase.storage
-        .from("covers")
-        .upload(path, compressed, {
-          contentType: file.type || "image/jpeg",
-          upsert: false,
-          cacheControl: "31536000",
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const processed = await processImageFile(file, 1600, 0.82);
+        newItems.push({
+          url: processed.url,
+          name: processed.name || `لقطة ${screenshots.length + i + 1}`,
         });
-      if (error) throw error;
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from("covers").getPublicUrl(data.path);
-      setScreenshots((prev) => [...prev, publicUrl]);
-    } catch (err) {
-      console.error("screenshot upload failed", err);
+      }
+
+      setScreenshots((prev) => [...prev, ...newItems]);
+      setUploadNotice(`تمت إضافة ${newItems.length} سكرين شوت بنجاح!`);
+      setTimeout(() => setUploadNotice(null), 4000);
+    } catch (err: any) {
+      setUploadError(err?.message || "فشل رفع السكرين شوتات");
     } finally {
       setUploadingScreenshot(false);
+      if (screenshotFileRef.current) {
+        screenshotFileRef.current.value = "";
+      }
     }
   };
 
   const addManualScreenshot = () => {
     if (!screenshotInputUrl.trim()) return;
-    setScreenshots((prev) => [...prev, screenshotInputUrl.trim()]);
+    const trimmed = screenshotInputUrl.trim();
+    const name = trimmed.split("/").pop() || `لقطة ${screenshots.length + 1}`;
+    setScreenshots((prev) => [...prev, { url: trimmed, name }]);
     setScreenshotInputUrl("");
+    setUploadNotice("تمت إضافة رابط السكرين شوت بنجاح!");
+    setTimeout(() => setUploadNotice(null), 3000);
   };
 
   const removeScreenshot = (index: number) => {
@@ -150,7 +194,26 @@ export function GameForm({
       <input type="hidden" name="id" value={game?.id ?? ""} />
       {live ? <input type="hidden" name="published" value="on" /> : null}
       <input type="hidden" name="cover_url" value={coverUrl} />
-      <input type="hidden" name="screenshots" value={JSON.stringify(screenshots)} />
+      <input
+        type="hidden"
+        name="screenshots"
+        value={JSON.stringify(screenshots.map((s) => s.url))}
+      />
+
+      {/* Global Notice / Feedback */}
+      {uploadNotice && (
+        <div className="flex items-center gap-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 px-4 py-3 text-sm font-semibold text-emerald-600 dark:text-emerald-400">
+          <CheckCircle2 className="h-4 w-4 shrink-0" />
+          <span>{uploadNotice}</span>
+        </div>
+      )}
+
+      {uploadError && (
+        <div className="flex items-center gap-2 rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm font-semibold text-red-600 dark:text-red-400">
+          <AlertCircle className="h-4 w-4 shrink-0" />
+          <span>{uploadError}</span>
+        </div>
+      )}
 
       {/* =========================================================================
           1. COVER IMAGE
@@ -169,6 +232,7 @@ export function GameForm({
                   fill
                   sizes="176px"
                   className="object-cover"
+                  unoptimized={coverUrl.startsWith("data:")}
                 />
                 <button
                   type="button"
@@ -189,11 +253,11 @@ export function GameForm({
             <input
               ref={fileRef}
               type="file"
-              accept="image/png,image/jpeg,image/webp"
+              accept="image/png,image/jpeg,image/webp,image/jpg"
               className="hidden"
               onChange={(e) => {
                 const file = e.target.files?.[0];
-                if (file) void uploadCover(file);
+                if (file) void handleCoverUpload(file);
               }}
             />
             <Button
@@ -426,11 +490,11 @@ export function GameForm({
           <input
             ref={screenshotFileRef}
             type="file"
-            accept="image/png,image/jpeg,image/webp"
+            accept="image/png,image/jpeg,image/webp,image/jpg"
+            multiple
             className="hidden"
             onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) void uploadScreenshot(file);
+              void handleScreenshotUpload(e.target.files);
             }}
           />
           <Button
@@ -439,10 +503,10 @@ export function GameForm({
             size="md"
             disabled={uploadingScreenshot}
             onClick={() => screenshotFileRef.current?.click()}
-            className="gap-2 shrink-0"
+            className="gap-2 shrink-0 bg-blue-600/10 text-blue-600 dark:text-blue-400 hover:bg-blue-600/20 border-blue-500/20"
           >
             {uploadingScreenshot ? <Spinner /> : <Upload className="h-4 w-4" />}
-            <span>رفع سكرين شوت من الجهاز</span>
+            <span>رفع سكرين شوت من الجهاز (يمكن اختيار عدة صور)</span>
           </Button>
 
           <div className="flex flex-1 gap-2">
@@ -461,7 +525,7 @@ export function GameForm({
               className="gap-1.5 shrink-0"
             >
               <Plus className="h-4 w-4" />
-              <span>إضافة</span>
+              <span>إضافة رابط</span>
             </Button>
           </div>
         </div>
@@ -469,17 +533,18 @@ export function GameForm({
         {/* Screenshots Grid / Preview */}
         {screenshots.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 pt-2">
-            {screenshots.map((url, i) => (
+            {screenshots.map((item, i) => (
               <div
                 key={i}
-                className="group relative aspect-video overflow-hidden rounded-xl border border-border bg-surface-2"
+                className="group relative aspect-video overflow-hidden rounded-xl border border-border bg-surface-2 shadow-2xs"
               >
                 <Image
-                  src={url}
-                  alt={`معاينة ${i + 1}`}
+                  src={item.url}
+                  alt={item.name || `معاينة ${i + 1}`}
                   fill
-                  sizes="160px"
+                  sizes="180px"
                   className="object-cover"
+                  unoptimized={item.url.startsWith("data:")}
                 />
                 <button
                   type="button"
@@ -489,15 +554,15 @@ export function GameForm({
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </button>
-                <span className="absolute bottom-1.5 start-1.5 rounded-md bg-black/70 px-1.5 py-0.5 text-[10px] font-semibold text-white">
-                  صورة {i + 1}
-                </span>
+                <div className="absolute bottom-0 inset-x-0 bg-black/75 px-2 py-1 text-[10px] font-medium text-white truncate backdrop-blur-xs">
+                  {item.name || `صورة ${i + 1}`}
+                </div>
               </div>
             ))}
           </div>
         ) : (
           <div className="rounded-xl border border-dashed border-border py-8 text-center text-xs text-muted">
-            لم يتم رفع أي سكرين شوت للتعريب بعد. اضغط على الزر أعلاه لرفع صور من الحوارات والقوائم العربية.
+            لم يتم رفع أي سكرين شوت للتعريب بعد. اضغط على الزر الأزرق أعلاه لاختيار صورة أو عدة صور من جهازك مباشرة.
           </div>
         )}
       </div>
