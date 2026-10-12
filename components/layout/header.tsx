@@ -48,9 +48,6 @@ export function Header({
     const supabase = createClient();
 
     const fetchRoleAndSetUser = async (sessionUser: any) => {
-      const email = sessionUser.email?.toLowerCase().trim() ?? "";
-      const isOwner = email === "argusargames@gmail.com" || email.startsWith("argusar");
-
       try {
         const { data: profile } = await supabase
           .from("profiles")
@@ -58,7 +55,7 @@ export function Header({
           .eq("id", sessionUser.id)
           .maybeSingle();
 
-        const role = (profile?.role as UserRole) || (isOwner ? "admin" : "user");
+        const role = (profile?.role as UserRole) || "user";
         setCurrentUser({
           email: sessionUser.email ?? null,
           fullName:
@@ -76,7 +73,7 @@ export function Header({
               sessionUser.user_metadata?.name ||
               sessionUser.email?.split("@")[0]) ??
             null,
-          role: isOwner ? "admin" : "user",
+          role: "user",
         });
       }
     };

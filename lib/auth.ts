@@ -35,9 +35,8 @@ export async function getProfile(): Promise<Profile | null> {
       return data as Profile;
     }
 
-    const email = user.email?.toLowerCase().trim() ?? "";
-    const isOwner = email === "argusargames@gmail.com" || email.startsWith("argusar");
-    const assignedRole = (user.user_metadata?.role as UserRole) || (isOwner ? "admin" : "user");
+    // All new registered users are 'user' by default. Admin is only granted if set in Supabase profiles table.
+    const assignedRole: UserRole = (user.user_metadata?.role as UserRole) || "user";
 
     // Fallback profile if record in public.profiles is not created yet
     const fallbackProfile: Profile = {
