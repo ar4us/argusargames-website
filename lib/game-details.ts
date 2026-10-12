@@ -1,3 +1,5 @@
+import gamesData from "@/data/games.json";
+
 export interface GameExtraDetail {
   year: string;
   developer: string;
@@ -424,43 +426,85 @@ export const GAME_EXTRAS: Record<string, GameExtraDetail> = {
  * Extracts and merges custom metadata stored in game.description_en or fallbacks to GAME_EXTRAS
  */
 export function getGameExtra(slug: string, rawDescriptionEn?: string | null): GameExtraDetail {
-  const base = GAME_EXTRAS[slug] || {
-    year: "2024",
-    developer: "مطور مستقل",
-    publisher: "ناشر مستقل",
-    knownAs: "",
-    genre: "ألعاب كمبيوتر • مغامرات",
-    genre_en: "PC Games • Adventure",
-    platforms: "PC (Windows)",
-    officialUrl: "",
-    status: "مكتمل 100%",
-    screenshots: [],
-    fileSize: "25 ميغابايت",
-    patchType: "حزمة استبدال ملفات اللعبة",
-    highlights: [
-      "تعريب عربي كامل وشامل للنصوص والقوائم",
-      "متوافق مع أحدث إصدارات اللعبة الرسمية",
-      "خطوط عربية واضحة ومريحة للقراءة",
-    ],
-    installSteps: [
-      {
-        step: 1,
-        title: "تحميل الباتش",
-        description: "حمّل ملف الباتش المضغوط وفك الضغط عنه بواسطة WinRAR أو 7-Zip.",
-      },
-      {
-        step: 2,
-        title: "نقل الملفات",
-        description: "انسخ محتويات الباتش وضعها داخل مجلد اللعبة الرئيسي أو شغل ملف التثبيت المرفق.",
-      },
-      {
-        step: 3,
-        title: "تشغيل اللعبة",
-        description: "شغل اللعبة واستمتع بتجربة اللعب باللغة العربية.",
-      },
-    ],
-    compatibilityNotes: "متوافق مع أحدث إصدارات اللعبة على نظام Windows (PC).",
-  };
+  const fromJson = (gamesData as any[]).find((g) => g.slug === slug);
+
+  const base: GameExtraDetail = fromJson
+    ? {
+        year: fromJson.year || "2024",
+        developer: fromJson.developer || "مطور مستقل",
+        publisher: fromJson.publisher || fromJson.developer || "ناشر مستقل",
+        knownAs: fromJson.known_as || "",
+        genre: fromJson.genre || "ألعاب كمبيوتر • مغامرات",
+        genre_en: "PC Games • Adventure",
+        platforms: fromJson.platforms || "PC (Windows)",
+        officialUrl: fromJson.official_url || "",
+        status: fromJson.status || "مكتمل 100%",
+        trailerYoutubeId: fromJson.trailer_youtube_id || "",
+        screenshots: fromJson.screenshots || [],
+        fileSize: fromJson.file_size || "20 ميغابايت",
+        patchType: "حزمة استبدال ملفات اللعبة",
+        aboutGame: fromJson.about_game || "",
+        highlights: fromJson.highlights || [
+          "تعريب عربي كامل وشامل للنصوص والقوائم",
+          "متوافق مع أحدث إصدارات اللعبة الرسمية",
+          "خطوط عربية واضحة ومريحة للقراءة",
+        ],
+        installSteps: fromJson.install_steps || [
+          {
+            step: 1,
+            title: "تحميل الباتش",
+            description: "حمّل ملف الباتش وفك الضغط عنه بواسطة WinRAR أو 7-Zip.",
+          },
+          {
+            step: 2,
+            title: "نقل الملفات",
+            description: "انقل ملفات التعريب إلى مجلد اللعبة الرئيسي.",
+          },
+          {
+            step: 3,
+            title: "تشغيل اللعبة",
+            description: "شغل اللعبة واستمتع بالتجربة باللغة العربية.",
+          },
+        ],
+        compatibilityNotes: "متوافق مع أحدث إصدارات اللعبة على نظام Windows (PC).",
+      }
+    : (GAME_EXTRAS[slug] || {
+        year: "2024",
+        developer: "مطور مستقل",
+        publisher: "ناشر مستقل",
+        knownAs: "",
+        genre: "ألعاب كمبيوتر • مغامرات",
+        genre_en: "PC Games • Adventure",
+        platforms: "PC (Windows)",
+        officialUrl: "",
+        status: "مكتمل 100%",
+        screenshots: [],
+        fileSize: "25 ميغابايت",
+        patchType: "حزمة استبدال ملفات اللعبة",
+        highlights: [
+          "تعريب عربي كامل وشامل للنصوص والقوائم",
+          "متوافق مع أحدث إصدارات اللعبة الرسمية",
+          "خطوط عربية واضحة ومريحة للقراءة",
+        ],
+        installSteps: [
+          {
+            step: 1,
+            title: "تحميل الباتش",
+            description: "حمّل ملف الباتش وفك الضغط عنه بواسطة WinRAR أو 7-Zip.",
+          },
+          {
+            step: 2,
+            title: "نقل الملفات",
+            description: "انقل ملفات التعريب إلى مجلد اللعبة الرئيسي.",
+          },
+          {
+            step: 3,
+            title: "تشغيل اللعبة",
+            description: "شغل اللعبة واستمتع بالتجربة باللغة العربية.",
+          },
+        ],
+        compatibilityNotes: "متوافق مع أحدث إصدارات اللعبة على نظام Windows (PC).",
+      });
 
   // If rawDescriptionEn contains JSON metadata saved from the admin panel, merge it!
   if (rawDescriptionEn && rawDescriptionEn.trim().startsWith("{")) {

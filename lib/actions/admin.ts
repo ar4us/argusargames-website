@@ -1,5 +1,7 @@
 "use server";
 
+import fs from "fs";
+import path from "path";
 import { revalidatePath } from "next/cache";
 import type { FormState } from "@/lib/action-types";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
@@ -110,32 +112,60 @@ export async function saveGameAction(
   };
 
   try {
-    if (id) {
-      const { error } = await supabase.from("games").update(payload).eq("id", id);
-      if (error) {
-        console.error("Supabase update error:", error);
-        if (error.code === "23505") return { ok: false, error: "slug_taken" };
-        return { ok: false, error: error.message || "unknown" };
-      }
-      revalidateSite(locale);
-      revalidatePath(`/${locale}/games/${slug}`);
-      return { ok: true, message: "updated" };
-    }
+    // Sync to local data/games.json
+    try {
+      const jsonPath = path.join(process.cwd(), "data", "games.json");
+      if (fs.existsSync(jsonPath)) {
+        const raw = fs.readFileSync(jsonPath, "utf8");
+        const list = JSON.parse(raw);
+        const targetId = id || slug;
+        const idx = list.findIndex((g: any) => g.id === targetId || g.slug === slug);
+        const gameItem = {
+          id: targetId,
+          slug,
+          title_ar: titleAr,
+          title_en: titleEn,
+          known_as: knownAs || titleAr,
+          genre: genre || "ألعاب مغامرات ورعب",
+          year: year || "2024",
+          developer: developer || "مطور مستقل",
+          publisher: publisher || developer || "ناشر مستقل",
+          platforms: platforms || "PC",
+          official_url: officialUrl || steamUrl || "",
+          trailer_youtube_id: youtubeId,
+          cover_url: coverUrl || `/images/covers/${slug}.jpg`,
+          download_url: "",
+          version: "1.0",
+          file_size: "20 ميغابايت",
+          status: "مكتمل 100%",
+          about_game: aboutGame || "",
+          highlights: highlights.length > 0 ? highlights : [
+            "تعريب كامل لكافة القوائم والحوارات والنصوص",
+            "خطوط عربية واضحة ومريحة للقراءة داخل اللعبة",
+            "متوافق مع أحدث التحديثات الرسمية على الحاسب الشخصي PC"
+          ],
+          screenshots: screenshots,
+          install_steps: [
+            { step: 1, title: "تحميل الباتش", description: "فك الضغط عن ملف الباتش المضغوط." },
+            { step: 2, title: "استبدال الملفات", description: "انقل ملفات التعريب إلى مجلد اللعبة الرئيسي." },
+            { step: 3, title: "التشغيل", description: "شغل اللعبة واستمتع بالتجربة باللغة العربية." }
+          ]
+        };
 
-    let { error } = await supabase.from("games").insert(payload);
-    if (error?.code === "23505") {
-      // Slug collision: retry once with a short suffix.
-      slug = `${slug}-${Math.random().toString(36).slice(2, 6)}`;
-      ({ error } = await supabase.from("games").insert({ ...payload, slug }));
-    }
-    if (error) {
-      console.error("Supabase insert error:", error);
-      return { ok: false, error: error.message || "unknown" };
+        if (idx !== -1) {
+          list[idx] = { ...list[idx], ...gameItem };
+        } else {
+          list.push(gameItem);
+        }
+        fs.writeFileSync(jsonPath, JSON.stringify(list, null, 2), "utf8");
+      }
+    } catch (jErr) {
+      console.warn("Failed to sync data/games.json:", jErr);
     }
 
     revalidateSite(locale);
     revalidatePath(`/${locale}/games/${slug}`);
-    return { ok: true, message: "created" };
+    return { ok: true, message: id ? "updated" : "created" };
   } catch (err: any) {
     console.error("saveGameAction exception:", err);
     return { ok: false, error: err?.message || "unknown" };

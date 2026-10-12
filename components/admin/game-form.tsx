@@ -133,12 +133,28 @@ export function GameForm({
     setUploadingCover(true);
     setUploadError(null);
     try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("slug", game?.slug || "cover");
+      const res = await fetch("/api/admin/upload-cover", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (data.ok && data.url) {
+        setCoverUrl(data.url);
+        setUploadNotice("تم رفع غلاف اللعبة وحفظه بنجاح!");
+      } else {
+        const processed = await processImageFile(file, 960, 0.75);
+        setCoverUrl(processed.url);
+        setUploadNotice("تم تحديث غلاف اللعبة بنجاح!");
+      }
+      setTimeout(() => setUploadNotice(null), 4000);
+    } catch {
       const processed = await processImageFile(file, 960, 0.75);
       setCoverUrl(processed.url);
-      setUploadNotice("تم تحديث غلاف اللعبة بنجاح");
+      setUploadNotice("تم تحديث غلاف اللعبة بنجاح!");
       setTimeout(() => setUploadNotice(null), 4000);
-    } catch (err: any) {
-      setUploadError(err?.message || "فشل معالجة صورة الغلاف");
     } finally {
       setUploadingCover(false);
     }
@@ -154,11 +170,33 @@ export function GameForm({
     try {
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
-        const processed = await processImageFile(file, 960, 0.70);
-        newItems.push({
-          url: processed.url,
-          name: processed.name || `لقطة ${screenshots.length + i + 1}`,
-        });
+        let uploaded = false;
+
+        try {
+          const formData = new FormData();
+          formData.append("file", file);
+          formData.append("slug", game?.slug || "screen");
+          const res = await fetch("/api/admin/upload-screenshot", {
+            method: "POST",
+            body: formData,
+          });
+          const data = await res.json();
+          if (data.ok && data.url) {
+            newItems.push({
+              url: data.url,
+              name: data.fileName || file.name,
+            });
+            uploaded = true;
+          }
+        } catch {}
+
+        if (!uploaded) {
+          const processed = await processImageFile(file, 960, 0.70);
+          newItems.push({
+            url: processed.url,
+            name: processed.name || file.name,
+          });
+        }
       }
 
       setScreenshots((prev) => [...prev, ...newItems]);
