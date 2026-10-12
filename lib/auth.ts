@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient, isSupabaseConfigured } from "./supabase/server";
+import { createAdminClient } from "./supabase/admin";
 import type { Profile, UserRole } from "./types";
 
 export async function getUser() {
@@ -48,11 +49,12 @@ export async function getProfile(): Promise<Profile | null> {
       created_at: user.created_at,
     };
 
-    // Attempt to insert it so future calls find it
+    // Attempt to insert it using admin client (bypasses RLS so it inserts with 100% certainty)
     try {
-      await supabase.from("profiles").upsert(fallbackProfile);
-    } catch {
-      // ignore
+      const adminClient = process.env.SUPABASE_SERVICE_ROLE_KEY ? createAdminClient() : supabase;
+      await adminClient.from("profiles").upsert(fallbackProfile);
+    } catch (upsertErr) {
+      console.warn("Failed to upsert fallback profile:", upsertErr);
     }
 
     return fallbackProfile;
