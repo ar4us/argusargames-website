@@ -40,6 +40,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# local asset source
-/logo-banner-hero
+/logo-banner-hero/
+# cloudflare / opennext
+.open-next/
+.wrangler/
 
