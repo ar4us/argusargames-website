@@ -224,8 +224,8 @@ export default async function GamePage({
           gameSlug={game.slug}
         />
 
-        {/* 5. Support & Coffee Widget */}
-        <SupportWidget />
+        {/* 5. Support & Coffee Widget (مخفي لعدم توفر حساب دعم حالياً) */}
+        {/* <SupportWidget /> */}
 
         {/* 6. Updates & Community Channels (مخفي مؤقتاً حتى تجهيز الحسابات) */}
         {/* <UpdatesTracker /> */}
