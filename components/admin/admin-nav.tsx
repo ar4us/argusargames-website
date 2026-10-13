@@ -1,6 +1,6 @@
 "use client";
 
-import { Gamepad2, Inbox, LayoutDashboard, Settings } from "lucide-react";
+import { Gamepad2, Inbox, LayoutDashboard, Settings, Sparkles } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
@@ -12,6 +12,7 @@ export function AdminNav() {
   const items = [
     { href: "/admin", label: t("dashboard"), Icon: LayoutDashboard, exact: true },
     { href: "/admin/games", label: t("games"), Icon: Gamepad2 },
+    { href: "/admin/upcoming", label: "التعريبات القادمة", Icon: Sparkles },
     { href: "/admin/requests", label: t("requests"), Icon: Inbox },
     { href: "/admin/settings", label: t("settings"), Icon: Settings },
   ];

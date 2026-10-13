@@ -50,9 +50,24 @@ export default async function AdminRequestsPage({
               <li key={req.id} className="px-4 py-4 sm:px-5">
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2 sm:justify-between">
                   <div className="min-w-0 flex-1">
-                    <p className="font-semibold text-foreground">
-                      {req.game_name}
-                    </p>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="font-semibold text-foreground">
+                        {req.game_name}
+                      </p>
+                      {req.request_type === "bug_report" || req.notes?.includes("نوع المشكلة:") ? (
+                        <span className="rounded-full bg-rose-500/10 px-2 py-0.5 text-[10px] font-bold text-rose-600 dark:text-rose-400 border border-rose-500/20">
+                          ⚠️ إبلاغ عن خطأ
+                        </span>
+                      ) : req.request_type === "update_request" || req.notes?.includes("إصدار/تفاصيل التحديث:") ? (
+                        <span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-bold text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                          🔄 طلب تحديث
+                        </span>
+                      ) : (
+                        <span className="rounded-full bg-blue-500/10 px-2 py-0.5 text-[10px] font-bold text-blue-600 dark:text-blue-400 border border-blue-500/20">
+                          🎮 طلب تعريب
+                        </span>
+                      )}
+                    </div>
                     <p className="mt-0.5 text-xs text-muted">
                       {requester?.full_name || requester?.email || t("requester")}
                       {" · "}

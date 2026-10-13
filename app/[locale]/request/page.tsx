@@ -8,6 +8,7 @@ import { Container } from "@/components/ui/container";
 import { Link } from "@/i18n/navigation";
 import { getUser } from "@/lib/auth";
 import {
+  getGames,
   getMyRequests,
   getMyVotes,
   getTopRequests,
@@ -24,8 +25,8 @@ export async function generateMetadata({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "request" });
   return {
-    title: t("title"),
-    description: t("subtitle"),
+    title: "اطلب تعريب أو بلّغ عن خطأ - ArgusArGames",
+    description: "مركز طلبات التعريب وتحديث الباتشات والإبلاغ عن الأخطاء والمشاكل لمجتمع اللاعبين العرب",
     alternates: alternates(locale, "/request"),
   };
 }
@@ -40,19 +41,22 @@ export default async function RequestPage({
   const t = await getTranslations("request");
 
   const user = await getUser();
-  const [top, my, myVotes] = await Promise.all([
+  const [top, my, myVotes, gamesRes] = await Promise.all([
     getTopRequests(15),
     user ? getMyRequests(user.id) : Promise.resolve([]),
     user ? getMyVotes(user.id) : Promise.resolve([]),
+    getGames({ perPage: 100 }),
   ]);
 
   return (
     <Container className="py-12">
       <header className="mb-10">
         <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-          {t("title")}
+          مركز طلبات التعريب والبلاغات
         </h1>
-        <p className="mt-2 max-w-2xl text-muted">{t("subtitle")}</p>
+        <p className="mt-2 max-w-2xl text-muted">
+          يمكنك هنا طلب تعريب لعبة جديدة، أو طلب تحديث لتعريب حالي بعد نزول باتش رسمي، أو الإبلاغ عن أي خطأ لمساعدتنا في إصلاحه.
+        </p>
       </header>
 
       <div className="grid gap-8 lg:grid-cols-5 lg:gap-12">
@@ -61,11 +65,11 @@ export default async function RequestPage({
           <div className="lg:sticky lg:top-6">
             <Card className="p-6">
               <h2 className="text-base font-semibold text-foreground">
-                {t("title")}
+                إرسال طلب جديد أو بلاغ
               </h2>
               {user ? (
                 <div className="mt-4">
-                  <RequestForm />
+                  <RequestForm games={gamesRes.games} />
                 </div>
               ) : (
                 <div className="mt-4 flex flex-col items-start gap-3 rounded-[var(--radius-card)] border border-dashed border-border-strong px-4 py-6">

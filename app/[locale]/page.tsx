@@ -9,14 +9,15 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { GameCard } from "@/components/games/game-card";
+import { LatestGamesGrid } from "@/components/home/latest-games-grid";
+import { UpcomingGamesSection } from "@/components/home/upcoming-games-section";
 import { HeroSearch } from "@/components/home/hero-search";
 import { LogoMark } from "@/components/brand/logo";
 import { buttonVariants } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/card";
 import { Container } from "@/components/ui/container";
 import { Link } from "@/i18n/navigation";
-import { getLatestGames, getMostDownloaded, getStats } from "@/lib/queries";
+import { getGames, getMostDownloaded, getStats, getUpcomingGames } from "@/lib/queries";
 import { isSupabaseConfigured } from "@/lib/supabase/server";
 import { alternates } from "@/lib/seo";
 import { formatNumber, getLocalized } from "@/lib/utils";
@@ -48,10 +49,11 @@ export default async function HomePage({
   const t = await getTranslations("home");
   const tc = await getTranslations("common");
 
-  const [latest, popular, stats] = await Promise.all([
-    getLatestGames(12),
+  const [latestRes, popular, stats, upcoming] = await Promise.all([
+    getGames({ sort: "newest", perPage: 8, page: 1 }),
     getMostDownloaded(5),
     getStats(),
+    getUpcomingGames(),
   ]);
 
   return (
@@ -121,7 +123,7 @@ export default async function HomePage({
       ) : null}
 
       {/* =========================================================================
-          LATEST LOCALIZATIONS DIRECTORY (CLEAN CARDS + PLATFORM FILTER)
+          LATEST LOCALIZATIONS DIRECTORY (LOAD MORE BUTTON INCLUDED)
          ========================================================================= */}
       <section>
         <Container>
@@ -146,12 +148,13 @@ export default async function HomePage({
             </Link>
           </div>
 
-          {latest.length > 0 ? (
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-              {latest.map((game) => (
-                <GameCard key={game.id} game={game} locale={locale} />
-              ))}
-            </div>
+          {latestRes.games.length > 0 ? (
+            <LatestGamesGrid
+              initialGames={latestRes.games}
+              total={latestRes.total}
+              locale={locale}
+              perPage={8}
+            />
           ) : (
             <EmptyState
               icon={<LogoMark className="h-10 w-10" />}
@@ -169,6 +172,11 @@ export default async function HomePage({
           )}
         </Container>
       </section>
+
+      {/* =========================================================================
+          UPCOMING LOCALIZATIONS SECTION (IN-PROGRESS PROJECTS)
+         ========================================================================= */}
+      <UpcomingGamesSection games={upcoming} locale={locale} />
 
       {/* =========================================================================
           MOST DOWNLOADED RANKED LIST (CLEAN LIST DESIGN)

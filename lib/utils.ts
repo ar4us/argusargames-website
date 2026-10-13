@@ -25,10 +25,8 @@ export function slugify(input: string): string {
     .slice(0, 80);
 }
 
-export function formatNumber(value: number, locale: string): string {
-  return new Intl.NumberFormat(locale === "ar" ? "ar-EG" : "en-US").format(
-    value,
-  );
+export function formatNumber(value: number, _locale?: string): string {
+  return new Intl.NumberFormat("en-US").format(value);
 }
 
 export function formatDate(
@@ -37,7 +35,7 @@ export function formatDate(
 ): string {
   if (!value) return "—";
   try {
-    return new Intl.DateTimeFormat(locale === "ar" ? "ar-EG" : "en-US", {
+    return new Intl.DateTimeFormat(locale === "ar" ? "ar-u-nu-latn" : "en-US", {
       year: "numeric",
       month: "short",
       day: "numeric",

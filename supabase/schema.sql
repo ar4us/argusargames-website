@@ -298,6 +298,37 @@ create policy covers_delete on storage.objects for delete
   using (bucket_id = 'covers' and public.is_staff());
 
 -- ============================================================================
+-- Upcoming Games & Request Type Enhancements
+-- ============================================================================
+alter table public.requests add column if not exists request_type text default 'new_translation';
+
+create table if not exists public.upcoming_games (
+  id                  uuid primary key default gen_random_uuid(),
+  slug                text not null unique,
+  title_ar            text not null,
+  title_en            text not null,
+  cover_url           text,
+  progress_percentage integer not null default 0,
+  status              text not null default 'قيد التعريب',
+  expected_date       text,
+  platforms           text default 'PC',
+  description         text,
+  created_at          timestamptz not null default now(),
+  updated_at          timestamptz not null default now()
+);
+
+alter table public.upcoming_games enable row level security;
+
+drop policy if exists upcoming_select on public.upcoming_games;
+create policy upcoming_select on public.upcoming_games for select using (true);
+
+drop policy if exists upcoming_write on public.upcoming_games;
+create policy upcoming_write on public.upcoming_games for all
+  using (public.is_staff())
+  with check (public.is_staff());
+
+-- ============================================================================
 -- Promote your first admin (run after signing up once), e.g.:
 --   update public.profiles set role = 'admin' where email = 'you@example.com';
 -- ============================================================================
+

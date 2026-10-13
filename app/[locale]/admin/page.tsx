@@ -2,6 +2,7 @@ import { Gamepad2, Layers, Inbox, Download } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { requireStaff } from "@/lib/auth";
 import { getStats } from "@/lib/queries";
+import { formatNumber } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -39,7 +40,7 @@ export default async function AdminOverviewPage({
               <Icon className="h-4.5 w-4.5" />
             </div>
             <p className="tabular mt-4 text-2xl font-bold text-foreground">
-              {value.toLocaleString(locale)}
+              {formatNumber(value)}
             </p>
             <p className="mt-1 text-sm text-muted">{label}</p>
           </div>

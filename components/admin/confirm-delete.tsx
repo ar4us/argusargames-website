@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
-import { deleteGameAction, deleteVersionAction } from "@/lib/actions/admin";
+import { deleteGameAction, deleteUpcomingGameAction, deleteVersionAction } from "@/lib/actions/admin";
 
 export function DeleteGameButton({
   gameId,
@@ -139,5 +139,23 @@ export function ConfirmDelete({
     <Button size={size} variant="danger" onClick={() => setConfirming(true)}>
       {label}
     </Button>
+  );
+}
+
+export function DeleteUpcomingButton({
+  id,
+  locale = "ar",
+}: {
+  id: string;
+  locale?: string;
+}) {
+  const tc = useTranslations("common");
+  return (
+    <ConfirmDelete
+      label={tc("delete")}
+      onConfirm={async () => {
+        await deleteUpcomingGameAction(id, locale);
+      }}
+    />
   );
 }

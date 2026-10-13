@@ -47,6 +47,8 @@ export interface GameVersion {
   created_at: string;
 }
 
+export type RequestType = "new_translation" | "update_request" | "bug_report";
+
 export interface LocalizationRequest {
   id: string;
   user_id: string;
@@ -54,8 +56,24 @@ export interface LocalizationRequest {
   game_url: string | null;
   notes: string | null;
   status: RequestStatus;
+  request_type?: RequestType | string;
   vote_count: number;
   created_at: string;
+}
+
+export interface UpcomingGame {
+  id: string;
+  slug: string;
+  title_ar: string;
+  title_en: string;
+  cover_url: string | null;
+  progress_percentage: number;
+  status: string;
+  expected_date: string | null;
+  platforms: string | null;
+  description: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface SiteSettings {

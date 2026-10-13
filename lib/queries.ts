@@ -5,6 +5,7 @@ import type {
   GameWithLatest,
   LocalizationRequest,
   SiteSettings,
+  UpcomingGame,
 } from "./types";
 
 export const DEFAULT_SETTINGS: SiteSettings = {
@@ -299,5 +300,40 @@ export async function getRequesters(
     return map;
   } catch {
     return {};
+  }
+}
+
+export async function getUpcomingGames(): Promise<UpcomingGame[]> {
+  if (!isSupabaseConfigured()) return [];
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("upcoming_games")
+      .select("*")
+      .order("progress_percentage", { ascending: false })
+      .order("created_at", { ascending: false });
+    if (error) {
+      // Table might not exist yet before migration
+      return [];
+    }
+    return (data as UpcomingGame[]) ?? [];
+  } catch {
+    return [];
+  }
+}
+
+export async function getUpcomingGameById(id: string): Promise<UpcomingGame | null> {
+  if (!isSupabaseConfigured()) return null;
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("upcoming_games")
+      .select("*")
+      .eq("id", id)
+      .maybeSingle();
+    if (error) return null;
+    return (data as UpcomingGame) ?? null;
+  } catch {
+    return null;
   }
 }

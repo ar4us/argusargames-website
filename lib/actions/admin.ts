@@ -324,3 +324,78 @@ export async function updateSettingsAction(
   revalidatePath(`/${locale}`, "layout");
   return { ok: true, message: "saved" };
 }
+
+export async function saveUpcomingGameAction(
+  _prev: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const ctx = await staffGuard();
+  if (!ctx) return { ok: false, error: "forbidden" };
+
+  const locale = String(formData.get("locale") ?? "ar");
+  const id = String(formData.get("id") ?? "").trim();
+  const titleAr = String(formData.get("title_ar") ?? "").trim();
+  const titleEn = String(formData.get("title_en") ?? "").trim();
+  let slug = slugify(String(formData.get("slug") ?? "").trim() || titleEn);
+  const coverUrl = String(formData.get("cover_url") ?? "").trim();
+  const progressPercentage = Math.min(
+    100,
+    Math.max(0, Number(formData.get("progress_percentage") ?? 0)),
+  );
+  const status = String(formData.get("status") ?? "قيد التعريب").trim();
+  const expectedDate = String(formData.get("expected_date") ?? "").trim();
+  const platforms = String(formData.get("platforms") ?? "PC").trim();
+  const description = String(formData.get("description") ?? "").trim();
+
+  if (!titleAr || !titleEn) return { ok: false, error: "required" };
+  if (!slug) slug = `upcoming-${Date.now()}`;
+
+  const payload = {
+    title_ar: titleAr,
+    title_en: titleEn,
+    slug,
+    cover_url: coverUrl || null,
+    progress_percentage: progressPercentage,
+    status: status || "قيد التعريب",
+    expected_date: expectedDate || null,
+    platforms: platforms || "PC",
+    description: description || null,
+    updated_at: new Date().toISOString(),
+  };
+
+  if (id) {
+    const { error } = await ctx.supabase
+      .from("upcoming_games")
+      .update(payload)
+      .eq("id", id);
+    if (error) return { ok: false, error: error.message };
+  } else {
+    const { error } = await ctx.supabase
+      .from("upcoming_games")
+      .insert(payload);
+    if (error) return { ok: false, error: error.message };
+  }
+
+  revalidatePath(`/${locale}`);
+  revalidatePath(`/${locale}/admin/upcoming`);
+  return { ok: true };
+}
+
+export async function deleteUpcomingGameAction(
+  id: string,
+  locale = "ar",
+): Promise<FormState> {
+  const ctx = await staffGuard();
+  if (!ctx) return { ok: false, error: "forbidden" };
+
+  const { error } = await ctx.supabase
+    .from("upcoming_games")
+    .delete()
+    .eq("id", id);
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath(`/${locale}`);
+  revalidatePath(`/${locale}/admin/upcoming`);
+  return { ok: true };
+}
+

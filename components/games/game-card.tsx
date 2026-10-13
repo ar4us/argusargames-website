@@ -1,18 +1,16 @@
-import { Download, Play, Gamepad2, ArrowLeft } from "lucide-react";
+import { Download, Play, Gamepad2 } from "lucide-react";
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import type { GameWithLatest } from "@/lib/types";
-import { formatNumber, getLocalized, formatDate } from "@/lib/utils";
-import { getTranslations } from "next-intl/server";
+import { formatNumber, getLocalized } from "@/lib/utils";
 
-export async function GameCard({
+export function GameCard({
   game,
   locale,
 }: {
   game: GameWithLatest;
   locale: string;
 }) {
-  const t = await getTranslations("games");
   const title = getLocalized(game, "title", locale);
 
   return (
