@@ -25,7 +25,7 @@ import { SupportWidget } from "@/components/games/support-widget";
 import { UpdatesTracker } from "@/components/games/updates-tracker";
 import { CommunityRequest } from "@/components/games/community-request";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export async function generateMetadata({
   params,

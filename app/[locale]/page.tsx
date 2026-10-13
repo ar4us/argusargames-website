@@ -23,7 +23,7 @@ import { alternates } from "@/lib/seo";
 import { formatNumber, getLocalized } from "@/lib/utils";
 import type { GameWithLatest } from "@/lib/types";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export async function generateMetadata({
   params,
