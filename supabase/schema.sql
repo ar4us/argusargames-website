@@ -300,6 +300,14 @@ create policy covers_delete on storage.objects for delete
 -- ============================================================================
 -- Upcoming Games & Request Type Enhancements
 -- ============================================================================
+create or replace function public.is_staff()
+returns boolean language sql stable security definer set search_path = public as $$
+  select exists (
+    select 1 from public.profiles
+    where id = auth.uid() and role in ('admin', 'editor')
+  );
+$$;
+
 alter table public.requests add column if not exists request_type text default 'new_translation';
 
 create table if not exists public.upcoming_games (
@@ -319,13 +327,15 @@ create table if not exists public.upcoming_games (
 
 alter table public.upcoming_games enable row level security;
 
-drop policy if exists upcoming_select on public.upcoming_games;
-create policy upcoming_select on public.upcoming_games for select using (true);
+do $$ begin
+  create policy upcoming_select on public.upcoming_games for select using (true);
+exception when duplicate_object then null; end $$;
 
-drop policy if exists upcoming_write on public.upcoming_games;
-create policy upcoming_write on public.upcoming_games for all
-  using (public.is_staff())
-  with check (public.is_staff());
+do $$ begin
+  create policy upcoming_write on public.upcoming_games for all
+    using (public.is_staff())
+    with check (public.is_staff());
+exception when duplicate_object then null; end $$;
 
 -- ============================================================================
 -- Promote your first admin (run after signing up once), e.g.:
