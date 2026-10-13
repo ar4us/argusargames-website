@@ -227,8 +227,8 @@ export default async function GamePage({
         {/* 5. Support & Coffee Widget */}
         <SupportWidget />
 
-        {/* 6. Updates & Community Channels */}
-        <UpdatesTracker />
+        {/* 6. Updates & Community Channels (مخفي مؤقتاً حتى تجهيز الحسابات) */}
+        {/* <UpdatesTracker /> */}
 
         {/* 7. Community Free Request Banner */}
         <CommunityRequest />
