@@ -171,3 +171,16 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Hide Netlify Drawer / Feedback Widget / Pre-launch toolbar */
+#netlify-drawer,
+[data-netlify-drawer],
+.netlify-drawer,
+div[class*="netlify-feedback"],
+iframe[src*="netlify"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
