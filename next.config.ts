@@ -10,12 +10,12 @@ const nextConfig: NextConfig = {
     },
   },
   images: {
+    unoptimized: true,
     // Covers are served from Supabase Storage or external sources.
     remotePatterns: [
       { protocol: "https", hostname: "**" },
       { protocol: "http", hostname: "localhost" },
     ],
-    qualities: [50, 75, 90],
   },
   turbopack: {
     rules: {
