@@ -36,7 +36,38 @@ export interface GameListResult {
   pageCount: number;
 }
 
+interface CacheEntry<T> {
+  data: T;
+  expiresAt: number;
+}
+
+const memoryCache = new Map<string, CacheEntry<unknown>>();
+
+function getCached<T>(key: string): T | null {
+  const entry = memoryCache.get(key);
+  if (!entry) return null;
+  if (Date.now() > entry.expiresAt) {
+    memoryCache.delete(key);
+    return null;
+  }
+  return entry.data as T;
+}
+
+function setCached<T>(key: string, data: T, ttlSeconds = 60) {
+  memoryCache.set(key, {
+    data,
+    expiresAt: Date.now() + ttlSeconds * 1000,
+  });
+}
+
+export function clearMemoryCache() {
+  memoryCache.clear();
+}
+
 export async function getSettings(): Promise<SiteSettings> {
+  const cached = getCached<SiteSettings>("site_settings");
+  if (cached) return cached;
+
   if (!isSupabaseConfigured()) return DEFAULT_SETTINGS;
   try {
     const supabase = await createClient();
@@ -45,7 +76,9 @@ export async function getSettings(): Promise<SiteSettings> {
       .select("*")
       .eq("id", 1)
       .maybeSingle();
-    return (data as SiteSettings) ?? DEFAULT_SETTINGS;
+    const res = (data as SiteSettings) ?? DEFAULT_SETTINGS;
+    setCached("site_settings", res, 300); // 5 minutes cache
+    return res;
   } catch {
     return DEFAULT_SETTINGS;
   }
@@ -58,6 +91,10 @@ export async function getGames({
   perPage = 12,
   includeUnpublished = false,
 }: GameListParams): Promise<GameListResult> {
+  const cacheKey = `games:${q}:${sort}:${page}:${perPage}:${includeUnpublished}`;
+  const cached = getCached<GameListResult>(cacheKey);
+  if (cached) return cached;
+
   const empty: GameListResult = {
     games: [],
     total: 0,
@@ -95,13 +132,15 @@ export async function getGames({
     if (error) throw error;
 
     const total = count ?? 0;
-    return {
+    const result: GameListResult = {
       games: (data as GameWithLatest[]) ?? [],
       total,
       page,
       perPage,
       pageCount: Math.max(1, Math.ceil(total / perPage)),
     };
+    setCached(cacheKey, result, 60);
+    return result;
   } catch {
     return empty;
   }
@@ -118,6 +157,10 @@ export async function getMostDownloaded(limit = 4): Promise<GameWithLatest[]> {
 }
 
 export async function getGameBySlug(slug: string): Promise<Game | null> {
+  const cacheKey = `game_slug:${slug}`;
+  const cached = getCached<Game>(cacheKey);
+  if (cached) return cached;
+
   if (!isSupabaseConfigured()) return null;
   try {
     const supabase = await createClient();
@@ -127,13 +170,19 @@ export async function getGameBySlug(slug: string): Promise<Game | null> {
       .eq("slug", slug)
       .eq("published", true)
       .maybeSingle();
-    return (data as Game) ?? null;
+    const res = (data as Game) ?? null;
+    if (res) setCached(cacheKey, res, 120);
+    return res;
   } catch {
     return null;
   }
 }
 
 export async function getGameById(id: string): Promise<Game | null> {
+  const cacheKey = `game_id:${id}`;
+  const cached = getCached<Game>(cacheKey);
+  if (cached) return cached;
+
   if (!isSupabaseConfigured()) return null;
   try {
     const supabase = await createClient();
@@ -142,13 +191,19 @@ export async function getGameById(id: string): Promise<Game | null> {
       .select("*")
       .eq("id", id)
       .maybeSingle();
-    return (data as Game) ?? null;
+    const res = (data as Game) ?? null;
+    if (res) setCached(cacheKey, res, 120);
+    return res;
   } catch {
     return null;
   }
 }
 
 export async function getGameVersions(gameId: string): Promise<GameVersion[]> {
+  const cacheKey = `versions:${gameId}`;
+  const cached = getCached<GameVersion[]>(cacheKey);
+  if (cached) return cached;
+
   if (!isSupabaseConfigured()) return [];
   try {
     const supabase = await createClient();
@@ -158,7 +213,9 @@ export async function getGameVersions(gameId: string): Promise<GameVersion[]> {
       .eq("game_id", gameId)
       .order("release_date", { ascending: false, nullsFirst: false })
       .order("created_at", { ascending: false });
-    return (data as GameVersion[]) ?? [];
+    const res = (data as GameVersion[]) ?? [];
+    setCached(cacheKey, res, 120);
+    return res;
   } catch {
     return [];
   }
@@ -238,6 +295,9 @@ export interface AdminStats {
 }
 
 export async function getStats(): Promise<AdminStats> {
+  const cached = getCached<AdminStats>("site_stats");
+  if (cached) return cached;
+
   if (!isSupabaseConfigured())
     return { games: 0, versions: 0, requests: 0, downloads: 0 };
   try {
@@ -252,12 +312,14 @@ export async function getStats(): Promise<AdminStats> {
       (sum, row) => sum + ((row.download_count as number) ?? 0),
       0,
     );
-    return {
+    const result: AdminStats = {
       games: games.count ?? 0,
       versions: versions.count ?? 0,
       requests: requests.count ?? 0,
       downloads: downloadTotal,
     };
+    setCached("site_stats", result, 120); // 2 minutes cache
+    return result;
   } catch {
     return { games: 0, versions: 0, requests: 0, downloads: 0 };
   }
@@ -304,6 +366,9 @@ export async function getRequesters(
 }
 
 export async function getUpcomingGames(): Promise<UpcomingGame[]> {
+  const cached = getCached<UpcomingGame[]>("upcoming_games");
+  if (cached) return cached;
+
   if (!isSupabaseConfigured()) return [];
   try {
     const supabase = await createClient();
@@ -316,7 +381,9 @@ export async function getUpcomingGames(): Promise<UpcomingGame[]> {
       // Table might not exist yet before migration
       return [];
     }
-    return (data as UpcomingGame[]) ?? [];
+    const res = (data as UpcomingGame[]) ?? [];
+    setCached("upcoming_games", res, 120); // 2 minutes cache
+    return res;
   } catch {
     return [];
   }

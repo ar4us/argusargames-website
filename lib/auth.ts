@@ -1,10 +1,23 @@
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient, isSupabaseConfigured } from "./supabase/server";
 import { createAdminClient } from "./supabase/admin";
 import type { Profile, UserRole } from "./types";
 
+async function hasSessionCookie(): Promise<boolean> {
+  try {
+    const cookieStore = await cookies();
+    return cookieStore
+      .getAll()
+      .some((c) => c.name.startsWith("sb-") && c.name.includes("-auth-token"));
+  } catch {
+    return false;
+  }
+}
+
 export async function getUser() {
   if (!isSupabaseConfigured()) return null;
+  if (!(await hasSessionCookie())) return null;
   try {
     const supabase = await createClient();
     const {
@@ -18,6 +31,7 @@ export async function getUser() {
 
 export async function getProfile(): Promise<Profile | null> {
   if (!isSupabaseConfigured()) return null;
+  if (!(await hasSessionCookie())) return null;
   try {
     const supabase = await createClient();
     const {

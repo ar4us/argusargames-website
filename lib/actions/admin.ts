@@ -5,6 +5,7 @@ import path from "path";
 import { revalidatePath } from "next/cache";
 import type { FormState } from "@/lib/action-types";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import { clearMemoryCache } from "@/lib/queries";
 import { slugify } from "@/lib/utils";
 import type { RequestStatus } from "@/lib/types";
 import { getProfile } from "@/lib/auth";
@@ -19,6 +20,7 @@ async function staffGuard() {
 }
 
 function revalidateSite(locale: string) {
+  clearMemoryCache();
   revalidatePath(`/${locale}`);
   revalidatePath(`/${locale}/games`);
   revalidatePath(`/${locale}/admin`);
