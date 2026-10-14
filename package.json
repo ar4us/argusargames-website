@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build:next": "next build",
-    "build": "opennextjs-cloudflare build",
+    "build": "node patch-opennext.js && opennextjs-cloudflare build",
+    "postinstall": "node patch-opennext.js",
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
     "start": "next start",
     "lint": "eslint"
