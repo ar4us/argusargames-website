@@ -1,0 +1,256 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { ArrowRight, Download, Gamepad2 } from "lucide-react";
+import { LatestGamesGrid } from "@/components/home/latest-games-grid";
+import { UpcomingGamesSection } from "@/components/home/upcoming-games-section";
+import { HeroSearch } from "@/components/home/hero-search";
+import { LogoMark } from "@/components/brand/logo";
+import Container from "@/components/ui/Container.astro";
+import { buttonVariants } from "@/components/ui/button";
+import {
+  getGames,
+  getMostDownloaded,
+  getStats,
+  getUpcomingGames,
+} from "@/lib/queries";
+import { formatNumber, getLocalized } from "@/lib/utils";
+import { getTranslations, type Locale } from "@/lib/i18n";
+
+interface Props {
+  locale?: Locale;
+}
+
+const { locale = "ar" } = Astro.props;
+const t = getTranslations(locale);
+
+const [latestRes, popular, stats, upcoming] = await Promise.all([
+  getGames({ sort: "newest", perPage: 8, page: 1 }),
+  getMostDownloaded(5),
+  getStats(),
+  getUpcomingGames(),
+]);
+---
+
+<BaseLayout locale={locale}>
+  <div class="flex flex-col gap-12 sm:gap-16 pb-20">
+    <!-- =========================================================================
+         HERO SECTION — MINIMALIST, HIGH-END & CLEAN (INSPIRED BY MUARRAB & TA3REB)
+        ========================================================================= -->
+    <section class="relative border-b border-border bg-gradient-to-b from-surface to-background py-16 sm:py-24">
+      <Container>
+        <div class="mx-auto max-w-3xl text-center">
+          <!-- Subtle Tag -->
+          <div class="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1 text-xs font-medium text-muted shadow-xs mb-6">
+            <span class="flex h-2 w-2 rounded-full bg-blue-600"></span>
+            <span>مكتبة تعريب ألعاب الفيديو العربية</span>
+          </div>
+
+          <!-- Main Headline -->
+          <h1 class="text-4xl sm:text-6xl font-black tracking-tight text-foreground leading-[1.15]">
+            حمّل تعريبات ألعابك المفضلة{" "}
+            <span class="text-blue-600 dark:text-blue-400">باللغة العربية</span>
+          </h1>
+
+          <!-- Subtitle -->
+          <p class="mt-5 text-base sm:text-lg text-muted max-w-xl mx-auto leading-relaxed">
+            منصة عربية تقدم لك باتشات تعريب احترافية، شروحات تثبيت خطوة بخطوة، وروابط تحميل مباشرة وسريعة لكافة المنصات.
+          </p>
+
+          <!-- Search Bar -->
+          <div class="mt-8 max-w-xl mx-auto">
+            <HeroSearch client:load />
+          </div>
+
+          <!-- Quick Metrics -->
+          <div class="mt-8 flex flex-wrap items-center justify-center gap-6 sm:gap-10 text-xs font-medium text-muted">
+            <div class="flex items-center gap-2">
+              <span class="text-base font-bold text-foreground tabular">
+                {formatNumber(stats.games, locale)}
+              </span>
+              <span>{t("home.statsGames")}</span>
+            </div>
+            <span class="text-border-strong">•</span>
+            <div class="flex items-center gap-2">
+              <span class="text-base font-bold text-foreground tabular">
+                {formatNumber(stats.versions, locale)}
+              </span>
+              <span>{t("home.statsVersions")}</span>
+            </div>
+            <span class="text-border-strong">•</span>
+            <div class="flex items-center gap-2">
+              <span class="text-base font-bold text-foreground tabular">
+                {formatNumber(stats.downloads, locale)}
+              </span>
+              <span>{t("home.statsDownloads")}</span>
+            </div>
+          </div>
+        </div>
+      </Container>
+    </section>
+
+    <!-- =========================================================================
+         LATEST LOCALIZATIONS DIRECTORY (LOAD MORE BUTTON INCLUDED)
+        ========================================================================= -->
+    <section>
+      <Container>
+        <div class="mb-6 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <h2 class="text-2xl font-bold tracking-tight text-foreground">
+                {t("home.latest")}
+              </h2>
+            </div>
+            <p class="mt-1 text-sm text-muted">
+              أحدث ملفات وباتشات التعريب التي تمت إضافتها وتحديثها
+            </p>
+          </div>
+
+          <a
+            href={`/${locale}/games`}
+            class="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600 dark:text-blue-400 hover:underline"
+          >
+            <span>{t("common.all")}</span>
+            <ArrowRight className="h-4 w-4 rtl:rotate-180" />
+          </a>
+        </div>
+
+        {latestRes.games.length > 0 ? (
+          <LatestGamesGrid
+            client:visible
+            initialGames={latestRes.games}
+            total={latestRes.total}
+            locale={locale}
+            perPage={8}
+          />
+        ) : (
+          <div class="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border-strong px-6 py-16 text-center">
+            <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-surface-2 text-muted">
+              <LogoMark className="h-10 w-10" />
+            </div>
+            <p class="text-base font-semibold text-foreground">{t("common.empty")}</p>
+            <p class="mt-1 max-w-sm text-sm text-muted">
+              لم يتم نشر أي ألعاب بعد. يمكنك طلب تعريب لعبتك المفضلة الآن!
+            </p>
+            <div class="mt-5">
+              <a
+                href={`/${locale}/request`}
+                class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md hover:bg-blue-500 transition-colors"
+              >
+                {t("home.requestCta")}
+              </a>
+            </div>
+          </div>
+        )}
+      </Container>
+    </section>
+
+    <!-- =========================================================================
+         UPCOMING LOCALIZATIONS SECTION (IN-PROGRESS PROJECTS)
+        ========================================================================= -->
+    <UpcomingGamesSection client:visible games={upcoming} locale={locale} />
+
+    <!-- =========================================================================
+         MOST DOWNLOADED RANKED LIST (CLEAN LIST DESIGN)
+        ========================================================================= -->
+    {popular.length > 0 ? (
+      <section class="pt-6">
+        <Container>
+          <div class="mb-6 flex items-end justify-between gap-4">
+            <div>
+              <h2 class="text-2xl font-bold tracking-tight text-foreground">
+                {t("home.mostDownloaded")}
+              </h2>
+              <p class="mt-1 text-sm text-muted">
+                التعريبات الأكثر شعبية وتثبيتاً من قِبل اللاعبين
+              </p>
+            </div>
+
+            <a
+              href={`/${locale}/games?sort=downloads`}
+              class="inline-flex items-center gap-1 text-sm font-semibold text-blue-600 dark:text-blue-400 hover:underline"
+            >
+              <span>{t("common.all")}</span>
+              <ArrowRight className="h-4 w-4 rtl:rotate-180" />
+            </a>
+          </div>
+
+          <ol class="overflow-hidden rounded-2xl border border-border bg-surface divide-y divide-border shadow-xs">
+            {popular.map((game, index) => {
+              const title = getLocalized(game, "title", locale);
+              return (
+                <li>
+                  <a
+                    href={`/${locale}/games/${game.slug}`}
+                    class="group flex items-center gap-4 px-5 py-3.5 transition-colors hover:bg-surface-2"
+                  >
+                    <span class="tabular font-bold flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-surface-2 text-xs text-muted group-hover:bg-foreground group-hover:text-background transition-colors">
+                      {index + 1}
+                    </span>
+
+                    <span class="relative h-12 w-16 shrink-0 overflow-hidden rounded-lg bg-surface-2">
+                      {game.cover_url ? (
+                        <img
+                          src={game.cover_url}
+                          alt=""
+                          loading="lazy"
+                          class="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <Gamepad2 className="absolute inset-0 m-auto h-5 w-5 opacity-30 text-muted" />
+                      )}
+                    </span>
+
+                    <span class="min-w-0 flex-1">
+                      <span class="block truncate text-sm font-bold text-foreground group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                        {title}
+                      </span>
+                      <span class="flex items-center gap-2 mt-0.5 text-xs text-muted">
+                        <span>{game.title_en}</span>
+                        {game.latest_version ? (
+                          <span class="rounded bg-surface-2 px-1.5 py-0.2 font-mono text-[10px]">
+                            v{game.latest_version}
+                          </span>
+                        ) : null}
+                      </span>
+                    </span>
+
+                    <span class="tabular inline-flex shrink-0 items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1 text-xs text-muted">
+                      <Download className="h-3.5 w-3.5" />
+                      <span>{formatNumber(game.download_count ?? 0, locale)}</span>
+                    </span>
+                  </a>
+                </li>
+              );
+            })}
+          </ol>
+        </Container>
+      </section>
+    ) : null}
+
+    <!-- =========================================================================
+         REQUEST LOCALIZATION CALLOUT (CLEAN & MINIMAL)
+        ========================================================================= -->
+    <section class="pt-4">
+      <Container>
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 rounded-2xl border border-border bg-surface-2/60 p-8 sm:p-10">
+          <div class="max-w-xl">
+            <h2 class="text-xl sm:text-2xl font-bold text-foreground">
+              لم تجد تعريب لعبتك المفضلة؟
+            </h2>
+            <p class="mt-2 text-sm text-muted leading-relaxed">
+              يمكنك إرسال طلب لتعريب أي لعبة تود رؤيتها باللغة العربية، وسيتم مراجعتها والتصويت عليها من قبل المجتمع.
+            </p>
+          </div>
+
+          <a
+            href={`/${locale}/request`}
+            class={buttonVariants({ variant: "primary", size: "lg", className: "shrink-0" })}
+          >
+            <span>{t("home.requestCta")}</span>
+            <ArrowRight className="h-4 w-4 rtl:rotate-180" />
+          </a>
+        </div>
+      </Container>
+    </section>
+  </div>
+</BaseLayout>
