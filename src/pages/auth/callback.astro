@@ -26,36 +26,52 @@ import "@/styles/globals.css";
           const next = rawNext && rawNext.startsWith("/") ? rawNext : "/ar";
           const code = url.searchParams.get("code");
 
-          // If PKCE code is in query params
           if (code) {
             await supabase.auth.exchangeCodeForSession(code);
           }
 
-          // If access_token hash is in the URL, wait a moment for Supabase to persist session
-          const { data: sessionData } = await supabase.auth.getSession();
-          const user = sessionData?.session?.user;
-
-          if (user) {
-            try {
-              // Upsert user profile in public.profiles table
-              await supabase.from("profiles").upsert({
-                id: user.id,
-                email: user.email ?? null,
-                full_name:
-                  user.user_metadata?.full_name ||
-                  user.user_metadata?.name ||
-                  user.email?.split("@")[0] ||
-                  "Admin",
-                avatar_url: user.user_metadata?.avatar_url ?? null,
-                role: "admin",
-              });
-            } catch (profileErr) {
-              console.error("Profile sync error:", profileErr);
+          let done = false;
+          const finish = async (user: any) => {
+            if (done) return;
+            done = true;
+            if (user) {
+              try {
+                await supabase.from("profiles").upsert({
+                  id: user.id,
+                  email: user.email ?? null,
+                  full_name:
+                    user.user_metadata?.full_name ||
+                    user.user_metadata?.name ||
+                    user.email?.split("@")[0] ||
+                    "Admin",
+                  avatar_url: user.user_metadata?.avatar_url ?? null,
+                  role: "admin",
+                });
+              } catch (profileErr) {
+                console.error("Profile sync error:", profileErr);
+              }
             }
+            window.location.replace(next);
+          };
+
+          const { data: sessionData } = await supabase.auth.getSession();
+          if (sessionData?.session?.user) {
+            await finish(sessionData.session.user);
+            return;
           }
 
-          // Redirect to the target page
-          window.location.replace(next);
+          const {
+            data: { subscription },
+          } = supabase.auth.onAuthStateChange(async (_event, session) => {
+            if (session?.user) {
+              subscription.unsubscribe();
+              await finish(session.user);
+            }
+          });
+
+          setTimeout(() => {
+            finish(null);
+          }, 1500);
         } catch (err) {
           console.error("Auth callback error:", err);
           window.location.replace("/ar");

@@ -89,18 +89,13 @@ export function Header({
     } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
         void fetchRoleAndSetUser(session.user);
-        router.refresh();
       } else {
         setCurrentUser(null);
       }
     });
 
-    if (typeof window !== "undefined" && window.location.search.includes("code=")) {
-      router.refresh();
-    }
-
     return () => subscription.unsubscribe();
-  }, [user, router]);
+  }, [user]);
 
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
@@ -140,7 +135,6 @@ export function Header({
     }
     setMenuOpen(false);
     router.replace("/");
-    router.refresh();
   };
 
   const navLink = (href: string, label: string, onClick?: () => void) => {

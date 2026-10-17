@@ -56,7 +56,7 @@ export function useRouter() {
       if (typeof window !== "undefined") window.location.replace(url);
     },
     refresh: () => {
-      if (typeof window !== "undefined") window.location.reload();
+      // Safe no-op in Astro static site to prevent infinite reload loops
     },
     back: () => {
       if (typeof window !== "undefined") window.history.back();
