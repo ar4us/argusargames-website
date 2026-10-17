@@ -1,0 +1,49 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { AdminNav } from "@/components/admin/admin-nav";
+import { Container } from "@/components/ui/container";
+import { SettingsForm } from "@/components/admin/settings-form";
+import { Card } from "@/components/ui/card";
+import { getSettings } from "@/lib/queries";
+import { getTranslations, type Locale } from "@/lib/i18n";
+
+export function getStaticPaths() {
+  return [{ params: { locale: "ar" } }, { params: { locale: "en" } }];
+}
+
+const { locale = "ar" } = Astro.params as { locale: Locale };
+const t = getTranslations(locale);
+const settings = await getSettings();
+---
+
+<BaseLayout locale={locale} title={t("admin.settings.title")}>
+  <Container className="py-10">
+    <header class="mb-8 flex flex-wrap items-end justify-between gap-4">
+      <h1 class="text-2xl font-bold tracking-tight text-foreground">
+        {t("admin.title")}
+      </h1>
+      <a
+        href={`/${locale}`}
+        class="text-sm font-medium text-muted hover:text-blue-600"
+      >
+        {t("admin.backToSite")} →
+      </a>
+    </header>
+
+    <div class="grid gap-8 lg:grid-cols-[200px_1fr]">
+      <aside>
+        <AdminNav client:load />
+      </aside>
+
+      <main class="min-w-0">
+        <h2 class="text-xl font-semibold tracking-tight text-foreground">
+          {t("admin.settings.title")}
+        </h2>
+        <p class="mt-1 text-sm text-muted">{t("admin.settings.subtitle")}</p>
+        <Card className="mt-6 max-w-3xl p-6">
+          <SettingsForm client:load settings={settings} />
+        </Card>
+      </main>
+    </div>
+  </Container>
+</BaseLayout>

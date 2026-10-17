@@ -1,0 +1,162 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { AdminNav } from "@/components/admin/admin-nav";
+import { Container } from "@/components/ui/container";
+import { DeleteVersionButton } from "@/components/admin/confirm-delete";
+import { GameForm } from "@/components/admin/game-form";
+import { VersionForm } from "@/components/admin/version-form";
+import { Card, Badge } from "@/components/ui/card";
+import { ArrowRight, Layers } from "lucide-react";
+import {
+  getAllGamesForAdmin,
+  getGameById,
+  getGameVersions,
+} from "@/lib/queries";
+import { formatDate } from "@/lib/utils";
+import { getTranslations, type Locale } from "@/lib/i18n";
+import type { Game } from "@/lib/types";
+
+export async function getStaticPaths() {
+  const games = await getAllGamesForAdmin();
+  const paths: any[] = [];
+  const locales: Locale[] = ["ar", "en"];
+
+  for (const locale of locales) {
+    for (const g of games) {
+      paths.push({
+        params: { locale, id: g.id },
+        props: { game: g },
+      });
+    }
+  }
+  return paths;
+}
+
+const { locale = "ar", id } = Astro.params as { locale: Locale; id: string };
+const props = Astro.props as { game?: Game };
+const game = props.game || (await getGameById(id));
+
+if (!game) {
+  return Astro.redirect(`/${locale}/admin/games`);
+}
+
+const versions = await getGameVersions(game.id);
+const t = getTranslations(locale);
+---
+
+<BaseLayout locale={locale} title={`تعديل: ${game.title_ar}`}>
+  <Container className="py-10">
+    <header class="mb-8 flex flex-wrap items-end justify-between gap-4">
+      <h1 class="text-2xl font-bold tracking-tight text-foreground">
+        {t("admin.title")}
+      </h1>
+      <a
+        href={`/${locale}`}
+        class="text-sm font-medium text-muted hover:text-blue-600"
+      >
+        {t("admin.backToSite")} →
+      </a>
+    </header>
+
+    <div class="grid gap-8 lg:grid-cols-[200px_1fr]">
+      <aside>
+        <AdminNav client:load />
+      </aside>
+
+      <main class="min-w-0 space-y-6">
+        <div>
+          <a
+            href={`/${locale}/admin/games`}
+            class="mb-3 inline-flex items-center gap-1.5 text-xs font-semibold text-muted hover:text-foreground transition-colors"
+          >
+            <ArrowRight className="h-4 w-4 rtl:rotate-180" />
+            <span>العودة لقائمة الألعاب</span>
+          </a>
+          <h2 class="text-2xl sm:text-3xl font-black tracking-tight text-foreground">
+            تعديل اللعبة: {game.title_ar}
+          </h2>
+          <p class="mt-1 text-sm text-muted">
+            إدارة مواصفات اللعبة، وصف القصة، أبرز المميزات، سكرين شوتات التعريب، وإصدارات التحميل.
+          </p>
+        </div>
+
+        <div class="grid gap-8 lg:grid-cols-[1fr_380px] xl:grid-cols-[1fr_420px] items-start">
+          <Card className="p-6 sm:p-8 space-y-6">
+            <div class="border-b border-border pb-4">
+              <h3 class="text-lg font-bold text-foreground">
+                بيانات ومواصفات اللعبة وسكرين شوتات التعريب
+              </h3>
+              <p class="text-xs text-muted mt-0.5">
+                تظهر هذه البيانات مباشرة في صفحة اللعبة الرئيسية ومكتبة التعريبات.
+              </p>
+            </div>
+            <GameForm client:load game={game} />
+          </Card>
+
+          <div class="space-y-6">
+            <Card className="p-6 space-y-5">
+              <div class="border-b border-border pb-4">
+                <div class="flex items-center gap-2">
+                  <Layers className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                  <h3 class="text-base font-bold text-foreground">
+                    إصدارات وباتشات التعريب ({versions.length})
+                  </h3>
+                </div>
+                <p class="text-xs text-muted mt-0.5">
+                  تحديد رقم الإصدار، المنصة، وحجم ملف التحميل
+                </p>
+              </div>
+
+              {versions.length > 0 ? (
+                <ul class="divide-y divide-border">
+                  {versions.map((v) => {
+                    let meta: { platform?: string; fileSize?: string } = {};
+                    if (v.notes_en && v.notes_en.startsWith("{")) {
+                      try {
+                        meta = JSON.parse(v.notes_en);
+                      } catch {}
+                    }
+
+                    return (
+                      <li class="flex flex-col gap-2 py-3.5 first:pt-0 last:pb-0">
+                        <div class="flex items-center justify-between">
+                          <div class="flex items-center gap-2">
+                            <Badge tone="accent" className="tabular font-bold">
+                              v{v.version}
+                            </Badge>
+                            <span class="rounded bg-surface-2 px-2 py-0.5 text-[10px] font-semibold text-muted">
+                              {meta.platform || "PC"}
+                            </span>
+                          </div>
+                          <DeleteVersionButton client:load versionId={v.id} locale={locale} />
+                        </div>
+
+                        <div class="flex items-center justify-between text-xs text-muted">
+                          <span>{formatDate(v.release_date ?? v.created_at, locale)}</span>
+                          <span class="tabular font-semibold text-foreground">
+                            {v.download_count} تنزيل
+                          </span>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              ) : (
+                <p class="rounded-xl border border-dashed border-border px-4 py-6 text-center text-xs text-muted">
+                  لا توجد إصدارات مضافة بعد. أضف أول إصدار للباتش أدناه.
+                </p>
+              )}
+
+              <div class="mt-6 border-t border-border pt-6">
+                <h4 class="text-xs font-bold text-foreground uppercase tracking-wider mb-3">
+                  إضافة إصدار جديد
+                </h4>
+                <VersionForm client:load gameId={id} />
+              </div>
+            </Card>
+          </div>
+        </div>
+      </main>
+    </div>
+  </Container>
+</BaseLayout>

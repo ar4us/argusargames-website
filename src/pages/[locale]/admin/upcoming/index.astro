@@ -1,0 +1,145 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { AdminNav } from "@/components/admin/admin-nav";
+import { Container } from "@/components/ui/container";
+import { DeleteUpcomingButton } from "@/components/admin/confirm-delete";
+import { buttonVariants } from "@/components/ui/button";
+import { Plus, Sparkles, Calendar, Link2 } from "lucide-react";
+import { getUpcomingGames } from "@/lib/queries";
+import { formatNumber } from "@/lib/utils";
+import { getTranslations, type Locale } from "@/lib/i18n";
+
+export function getStaticPaths() {
+  return [{ params: { locale: "ar" } }, { params: { locale: "en" } }];
+}
+
+const { locale = "ar" } = Astro.params as { locale: Locale };
+const t = getTranslations(locale);
+const upcomingGames = await getUpcomingGames();
+---
+
+<BaseLayout locale={locale} title="التعريبات القادمة ومشاريع قيد العمل">
+  <Container className="py-10">
+    <header class="mb-8 flex flex-wrap items-end justify-between gap-4">
+      <h1 class="text-2xl font-bold tracking-tight text-foreground">
+        {t("admin.title")}
+      </h1>
+      <a
+        href={`/${locale}`}
+        class="text-sm font-medium text-muted hover:text-blue-600"
+      >
+        {t("admin.backToSite")} →
+      </a>
+    </header>
+
+    <div class="grid gap-8 lg:grid-cols-[200px_1fr]">
+      <aside>
+        <AdminNav client:load />
+      </aside>
+
+      <main class="min-w-0">
+        <div class="mb-6 flex items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-amber-500" />
+              <span>التعريبات القادمة ومشاريع قيد العمل</span>
+            </h2>
+            <p class="mt-1 text-xs text-muted">
+              إدارة مشاريع التعريب التي تعمل عليها حالياً لتظهر في الموقع للمتابعين
+            </p>
+          </div>
+
+          <a
+            href={`/${locale}/admin/upcoming/new`}
+            class={buttonVariants({ size: "sm" })}
+          >
+            <Plus className="h-4 w-4" />
+            <span>إضافة مشروع قادم</span>
+          </a>
+        </div>
+
+        {upcomingGames.length === 0 ? (
+          <div class="rounded-2xl border border-dashed border-border-strong px-4 py-12 text-center text-sm text-muted">
+            <Sparkles className="mx-auto h-8 w-8 text-muted/50 mb-3" />
+            <p class="font-semibold text-foreground">لا توجد مشاريع تعريب قادمة حالياً</p>
+            <p class="mt-1 text-xs text-muted">
+              أضف مشروعاً جديداً لتخبر اللاعبين بنسبة إنجازه وموعد صدوره المتوقع!
+            </p>
+            <div class="mt-4">
+              <a
+                href={`/${locale}/admin/upcoming/new`}
+                class={buttonVariants({ size: "sm" })}
+              >
+                <Plus className="h-4 w-4" />
+                <span>إضافة أول مشروع قادم</span>
+              </a>
+            </div>
+          </div>
+        ) : (
+          <ul class="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-surface">
+            {upcomingGames.map((game) => (
+              <li class="flex flex-wrap items-center gap-4 px-4 py-4 sm:flex-nowrap">
+                <span class="relative h-14 w-20 shrink-0 overflow-hidden rounded-lg bg-surface-2 border border-border">
+                  {game.cover_url ? (
+                    <img
+                      src={game.cover_url}
+                      alt=""
+                      loading="lazy"
+                      class="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <Sparkles className="absolute inset-0 m-auto h-6 w-6 opacity-30 text-amber-500" />
+                  )}
+                </span>
+
+                <div class="min-w-0 flex-1 space-y-1">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <p class="font-bold text-foreground">
+                      {game.title_ar}
+                    </p>
+                    <span class="text-xs text-muted font-medium" dir="ltr">
+                      ({game.title_en})
+                    </span>
+                    <span class="rounded-full bg-blue-500/10 px-2 py-0.5 text-[11px] font-bold text-blue-600 dark:text-blue-400">
+                      {game.status}
+                    </span>
+                  </div>
+
+                  <div class="flex items-center gap-3 pt-1 max-w-md">
+                    <div class="h-2 flex-1 rounded-full bg-surface-2 overflow-hidden border border-border/50">
+                      <div
+                        class="h-full rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 transition-all"
+                        style={`width: ${Math.min(100, Math.max(0, game.progress_percentage))}%`}
+                      ></div>
+                    </div>
+                    <span class="text-xs font-bold text-foreground tabular">
+                      %{formatNumber(game.progress_percentage, locale)}
+                    </span>
+                  </div>
+
+                  {game.expected_date ? (
+                    <p class="text-xs text-muted flex items-center gap-1">
+                      <Calendar className="h-3 w-3" />
+                      <span>الموعد المتوقع: {game.expected_date}</span>
+                    </p>
+                  ) : null}
+                </div>
+
+                <div class="flex shrink-0 items-center gap-2">
+                  <a
+                    href={`/${locale}/admin/upcoming/${game.id}`}
+                    class={buttonVariants({ variant: "secondary", size: "sm" })}
+                  >
+                    <Link2 className="h-3.5 w-3.5" />
+                    <span>تعديل</span>
+                  </a>
+                  <DeleteUpcomingButton client:load id={game.id} locale={locale} />
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </main>
+    </div>
+  </Container>
+</BaseLayout>

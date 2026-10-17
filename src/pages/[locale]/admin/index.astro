@@ -1,0 +1,65 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { AdminNav } from "@/components/admin/admin-nav";
+import { Container } from "@/components/ui/container";
+import { Gamepad2, Layers, Inbox, Download } from "lucide-react";
+import { getStats } from "@/lib/queries";
+import { formatNumber } from "@/lib/utils";
+import { getTranslations, type Locale } from "@/lib/i18n";
+
+export function getStaticPaths() {
+  return [{ params: { locale: "ar" } }, { params: { locale: "en" } }];
+}
+
+const { locale = "ar" } = Astro.params as { locale: Locale };
+const t = getTranslations(locale);
+const stats = await getStats();
+
+const cards = [
+  { label: t("admin.stats.games"), value: stats.games, Icon: Gamepad2 },
+  { label: t("admin.stats.versions"), value: stats.versions, Icon: Layers },
+  { label: t("admin.stats.requests"), value: stats.requests, Icon: Inbox },
+  { label: t("admin.stats.downloads"), value: stats.downloads, Icon: Download },
+];
+---
+
+<BaseLayout locale={locale} title={t("admin.title")}>
+  <Container className="py-10">
+    <header class="mb-8 flex flex-wrap items-end justify-between gap-4">
+      <h1 class="text-2xl font-bold tracking-tight text-foreground">
+        {t("admin.title")}
+      </h1>
+      <a
+        href={`/${locale}`}
+        class="text-sm font-medium text-muted hover:text-blue-600"
+      >
+        {t("admin.backToSite")} →
+      </a>
+    </header>
+
+    <div class="grid gap-8 lg:grid-cols-[200px_1fr]">
+      <aside>
+        <AdminNav client:load />
+      </aside>
+
+      <main class="min-w-0">
+        <h2 class="mb-6 text-xl font-semibold tracking-tight text-foreground">
+          {t("admin.dashboard")}
+        </h2>
+        <div class="grid grid-cols-2 gap-4 xl:grid-cols-4">
+          {cards.map(({ label, value, Icon }) => (
+            <div class="rounded-2xl border border-border bg-surface p-5 shadow-xs">
+              <div class="flex h-9 w-9 items-center justify-center rounded-full bg-blue-600/10 text-blue-600">
+                <Icon className="h-4.5 w-4.5" />
+              </div>
+              <p class="tabular mt-4 text-2xl font-bold text-foreground">
+                {formatNumber(value, locale)}
+              </p>
+              <p class="mt-1 text-sm text-muted">{label}</p>
+            </div>
+          ))}
+        </div>
+      </main>
+    </div>
+  </Container>
+</BaseLayout>

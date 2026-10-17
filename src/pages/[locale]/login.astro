@@ -1,0 +1,31 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { AuthShell } from "@/components/auth/auth-shell";
+import { LoginForm } from "@/components/auth/login-form";
+import { SocialButtons } from "@/components/auth/social-buttons";
+import { Divider } from "@/components/auth/divider";
+import { getTranslations, type Locale } from "@/lib/i18n";
+
+export function getStaticPaths() {
+  return [{ params: { locale: "ar" } }, { params: { locale: "en" } }];
+}
+
+const { locale = "ar" } = Astro.params as { locale: Locale };
+const t = getTranslations(locale);
+---
+
+<BaseLayout locale={locale} title={t("auth.loginTitle")}>
+  <div class="py-12">
+    <AuthShell client:load title={t("auth.loginTitle")} subtitle={t("auth.loginSubtitle")}>
+      <SocialButtons client:load />
+      <Divider client:load label={t("auth.orContinueWith")} />
+      <LoginForm client:load />
+      <p class="mt-6 text-center text-sm text-muted">
+        {t("auth.noAccount")}{" "}
+        <a href={`/${locale}/register`} class="font-medium text-blue-600 hover:underline">
+          {t("auth.register")}
+        </a>
+      </p>
+    </AuthShell>
+  </div>
+</BaseLayout>

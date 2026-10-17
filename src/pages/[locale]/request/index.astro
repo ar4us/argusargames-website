@@ -1,0 +1,68 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { RequestForm } from "@/components/request/request-form";
+import { RequestList } from "@/components/request/request-list";
+import { Card } from "@/components/ui/card";
+import { Container } from "@/components/ui/container";
+import { getGames, getTopRequests } from "@/lib/queries";
+import { getTranslations, type Locale } from "@/lib/i18n";
+
+export function getStaticPaths() {
+  return [{ params: { locale: "ar" } }, { params: { locale: "en" } }];
+}
+
+const { locale = "ar" } = Astro.params as { locale: Locale };
+const t = getTranslations(locale);
+
+const [top, gamesRes] = await Promise.all([
+  getTopRequests(20),
+  getGames({ perPage: 100 }),
+]);
+---
+
+<BaseLayout
+  locale={locale}
+  title="مركز طلبات التعريب والبلاغات"
+  description="مركز طلبات التعريب وتحديث الباتشات والإبلاغ عن الأخطاء والمشاكل لمجتمع اللاعبين العرب"
+>
+  <Container className="py-12">
+    <header class="mb-10">
+      <h1 class="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+        مركز طلبات التعريب والبلاغات
+      </h1>
+      <p class="mt-2 max-w-2xl text-muted">
+        يمكنك هنا طلب تعريب لعبة جديدة، أو طلب تحديث لتعريب حالي بعد نزول باتش رسمي، أو الإبلاغ عن أي خطأ لمساعدتنا في إصلاحه.
+      </p>
+    </header>
+
+    <div class="grid gap-8 lg:grid-cols-5 lg:gap-12">
+      <!-- Form Section -->
+      <div class="lg:col-span-2">
+        <div class="lg:sticky lg:top-6">
+          <Card className="p-6">
+            <h2 class="text-base font-semibold text-foreground">
+              إرسال طلب جديد أو بلاغ
+            </h2>
+            <div class="mt-4">
+              <RequestForm client:load games={gamesRes.games} />
+            </div>
+          </Card>
+        </div>
+      </div>
+
+      <!-- Top Requests Section -->
+      <div class="lg:col-span-3">
+        <h2 class="mb-4 text-xl font-semibold tracking-tight text-foreground">
+          {t("request.topRequests")}
+        </h2>
+        <RequestList
+          client:load
+          requests={top}
+          myVotes={[]}
+          locale={locale}
+          empty="noTopRequests"
+        />
+      </div>
+    </div>
+  </Container>
+</BaseLayout>

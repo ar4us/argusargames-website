@@ -1,0 +1,55 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { AdminNav } from "@/components/admin/admin-nav";
+import { Container } from "@/components/ui/container";
+import { UpcomingGameForm } from "@/components/admin/upcoming-form";
+import { Card } from "@/components/ui/card";
+import { ArrowRight, Sparkles } from "lucide-react";
+import { getTranslations, type Locale } from "@/lib/i18n";
+
+export function getStaticPaths() {
+  return [{ params: { locale: "ar" } }, { params: { locale: "en" } }];
+}
+
+const { locale = "ar" } = Astro.params as { locale: Locale };
+const t = getTranslations(locale);
+---
+
+<BaseLayout locale={locale} title="إضافة مشروع تعريب قادم">
+  <Container className="py-10">
+    <header class="mb-8 flex flex-wrap items-end justify-between gap-4">
+      <h1 class="text-2xl font-bold tracking-tight text-foreground">
+        {t("admin.title")}
+      </h1>
+      <a
+        href={`/${locale}`}
+        class="text-sm font-medium text-muted hover:text-blue-600"
+      >
+        {t("admin.backToSite")} →
+      </a>
+    </header>
+
+    <div class="grid gap-8 lg:grid-cols-[200px_1fr]">
+      <aside>
+        <AdminNav client:load />
+      </aside>
+
+      <main class="min-w-0">
+        <a
+          href={`/${locale}/admin/upcoming`}
+          class="mb-4 inline-flex items-center gap-1 text-sm text-muted hover:text-blue-600"
+        >
+          <ArrowRight className="h-4 w-4 rtl:rotate-180" />
+          <span>العودة لقائمة التعريبات القادمة</span>
+        </a>
+        <h2 class="mb-6 text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">
+          <Sparkles className="h-6 w-6 text-amber-500" />
+          <span>إضافة مشروع تعريب قادم جديد</span>
+        </h2>
+        <Card className="max-w-2xl p-6 sm:p-8">
+          <UpcomingGameForm client:load locale={locale} />
+        </Card>
+      </main>
+    </div>
+  </Container>
+</BaseLayout>

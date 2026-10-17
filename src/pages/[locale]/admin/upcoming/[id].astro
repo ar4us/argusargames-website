@@ -1,0 +1,75 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { AdminNav } from "@/components/admin/admin-nav";
+import { Container } from "@/components/ui/container";
+import { UpcomingGameForm } from "@/components/admin/upcoming-form";
+import { Card } from "@/components/ui/card";
+import { ArrowRight } from "lucide-react";
+import { getUpcomingGames, getUpcomingGameById } from "@/lib/queries";
+import { getTranslations, type Locale } from "@/lib/i18n";
+import type { UpcomingGame } from "@/lib/types";
+
+export async function getStaticPaths() {
+  const games = await getUpcomingGames();
+  const paths: any[] = [];
+  const locales: Locale[] = ["ar", "en"];
+
+  for (const locale of locales) {
+    for (const g of games) {
+      paths.push({
+        params: { locale, id: g.id },
+        props: { game: g },
+      });
+    }
+  }
+  return paths;
+}
+
+const { locale = "ar", id } = Astro.params as { locale: Locale; id: string };
+const props = Astro.props as { game?: UpcomingGame };
+const game = props.game || (await getUpcomingGameById(id));
+
+if (!game) {
+  return Astro.redirect(`/${locale}/admin/upcoming`);
+}
+
+const t = getTranslations(locale);
+---
+
+<BaseLayout locale={locale} title={`تعديل: ${game.title_ar}`}>
+  <Container className="py-10">
+    <header class="mb-8 flex flex-wrap items-end justify-between gap-4">
+      <h1 class="text-2xl font-bold tracking-tight text-foreground">
+        {t("admin.title")}
+      </h1>
+      <a
+        href={`/${locale}`}
+        class="text-sm font-medium text-muted hover:text-blue-600"
+      >
+        {t("admin.backToSite")} →
+      </a>
+    </header>
+
+    <div class="grid gap-8 lg:grid-cols-[200px_1fr]">
+      <aside>
+        <AdminNav client:load />
+      </aside>
+
+      <main class="min-w-0">
+        <a
+          href={`/${locale}/admin/upcoming`}
+          class="mb-4 inline-flex items-center gap-1 text-sm text-muted hover:text-blue-600"
+        >
+          <ArrowRight className="h-4 w-4 rtl:rotate-180" />
+          <span>العودة لقائمة التعريبات القادمة</span>
+        </a>
+        <h2 class="mb-6 text-2xl font-bold tracking-tight text-foreground">
+          تعديل مشروع: {game.title_ar}
+        </h2>
+        <Card className="max-w-2xl p-6 sm:p-8">
+          <UpcomingGameForm client:load game={game} locale={locale} />
+        </Card>
+      </main>
+    </div>
+  </Container>
+</BaseLayout>

@@ -1,0 +1,26 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { Container } from "@/components/ui/container";
+import { ProfileView } from "@/components/profile/profile-view";
+import { getTranslations, type Locale } from "@/lib/i18n";
+
+export function getStaticPaths() {
+  return [{ params: { locale: "ar" } }, { params: { locale: "en" } }];
+}
+
+const { locale = "ar" } = Astro.params as { locale: Locale };
+const t = getTranslations(locale);
+---
+
+<BaseLayout locale={locale} title={t("profile.title")} description={t("profile.subtitle")}>
+  <Container className="py-12">
+    <header class="mb-10">
+      <h1 class="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+        {t("profile.title")}
+      </h1>
+      <p class="mt-2 text-muted">{t("profile.subtitle")}</p>
+    </header>
+
+    <ProfileView client:load locale={locale} />
+  </Container>
+</BaseLayout>

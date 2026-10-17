@@ -1,0 +1,245 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import {
+  CalendarDays,
+  ExternalLink,
+  Gamepad2,
+  Download,
+  Building2,
+  Layers,
+  ArrowDown,
+} from "lucide-react";
+import { Container } from "@/components/ui/container";
+import {
+  getAllPublishedGames,
+  getGameBySlug,
+  getGameVersions,
+} from "@/lib/queries";
+import { formatNumber, getLocalized } from "@/lib/utils";
+import { getGameExtra } from "@/lib/game-details";
+import { GameOverviewSpec } from "@/components/games/game-overview-spec";
+import { GameScreenshots } from "@/components/games/game-screenshots";
+import { DownloadSection } from "@/components/games/download-section";
+import { SupportWidget } from "@/components/games/support-widget";
+import { CommunityRequest } from "@/components/games/community-request";
+import { getTranslations, type Locale } from "@/lib/i18n";
+import type { Game } from "@/lib/types";
+
+export async function getStaticPaths() {
+  const games = await getAllPublishedGames();
+  const paths: any[] = [];
+  const locales: Locale[] = ["ar", "en"];
+
+  // Ensure fallback games exist even if database is empty at build time
+  const fallbackSlugs = ["silent-hill-townfall"];
+  const allGames = [...games];
+
+  for (const s of fallbackSlugs) {
+    if (!allGames.some((g) => g.slug === s)) {
+      allGames.push({
+        id: "demo-" + s,
+        slug: s,
+        title_ar: "سايلنت هيل: تاونفول",
+        title_en: "Silent Hill: Townfall",
+        description_ar: "باتش تعريب لعبة سايلنت هيل: تاونفول بالكامل مع ترجمة الحوارات والقوائم وتعديل الخطوط والرموز.",
+        description_en: "Full Arabic localization patch for Silent Hill: Townfall.",
+        cover_url: "/covers/silent-hill-townfall.jpg",
+        steam_url: "https://store.steampowered.com/app/silent-hill-townfall",
+        published: true,
+        download_count: 1420,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      });
+    }
+  }
+
+  for (const locale of locales) {
+    for (const game of allGames) {
+      paths.push({
+        params: { locale, slug: game.slug },
+        props: { game },
+      });
+    }
+  }
+  return paths;
+}
+
+const { locale = "ar", slug } = Astro.params as { locale: Locale; slug: string };
+const props = Astro.props as { game?: Game };
+const game = props.game || (await getGameBySlug(slug));
+
+if (!game) {
+  return Astro.redirect(`/${locale}/games`);
+}
+
+const versions = await getGameVersions(game.id);
+const title = getLocalized(game, "title", locale);
+const extra = getGameExtra(game.slug, game.description_en);
+const t = getTranslations(locale);
+
+const pageTitle = `تعريب ${title}`;
+const pageDesc =
+  getLocalized(game, "description", locale) ||
+  `تحميل باتش تعريب ${game.title_ar} (${game.title_en}) للكمبيوتر مجاناً بروابط مباشرة.`;
+---
+
+<BaseLayout locale={locale} title={pageTitle} description={pageDesc}>
+  <div class="pb-20">
+    <!-- =========================================================================
+         HERO & GAME INTRO
+        ========================================================================= -->
+    <section class="relative overflow-hidden border-b border-border bg-gradient-to-b from-surface via-background to-background py-10 sm:py-16">
+      {game.cover_url && (
+        <div class="pointer-events-none absolute inset-0 -top-40 overflow-hidden opacity-15 blur-3xl">
+          <img
+            src={game.cover_url}
+            alt=""
+            loading="eager"
+            class="h-full w-full object-cover"
+          />
+        </div>
+      )}
+
+      <Container className="relative">
+        <!-- Breadcrumbs -->
+        <nav class="mb-8 flex items-center gap-2 text-xs sm:text-sm text-muted">
+          <a href={`/${locale}`} class="hover:text-blue-600 transition-colors">
+            {t("nav.home")}
+          </a>
+          <span aria-hidden="true">›</span>
+          <a href={`/${locale}/games`} class="hover:text-blue-600 transition-colors">
+            {t("nav.games")}
+          </a>
+          <span aria-hidden="true">›</span>
+          <span class="truncate text-foreground font-semibold">
+            تعريب {title}
+          </span>
+        </nav>
+
+        <div class="grid gap-8 lg:grid-cols-[minmax(0,380px)_1fr] lg:gap-12 items-start">
+          <!-- Game Cover -->
+          <div class="group relative aspect-[16/9] lg:aspect-[4/3] w-full overflow-hidden rounded-2xl border border-border bg-surface-2 shadow-2xl shadow-black/10">
+            {game.cover_url ? (
+              <img
+                src={game.cover_url}
+                alt={title}
+                loading="eager"
+                class="h-full w-full object-cover"
+              />
+            ) : (
+              <div class="flex h-full items-center justify-center bg-surface-2 text-muted">
+                <Gamepad2 className="h-16 w-16 opacity-30" />
+              </div>
+            )}
+            <div class="absolute top-3 start-3">
+              <span class="rounded-md bg-blue-600 px-2.5 py-1 text-xs font-bold text-white shadow-xs">
+                {extra.status}
+              </span>
+            </div>
+          </div>
+
+          <!-- Game Header Details -->
+          <div class="flex flex-col justify-between">
+            <div>
+              <span class="text-xs sm:text-sm font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+                تعريب رسمي ومجاني
+              </span>
+              <h1 class="mt-1 text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-foreground leading-[1.2]">
+                تعريب {title}
+              </h1>
+              <p class="mt-1 text-base sm:text-lg text-muted font-medium" dir="ltr">
+                {game.title_en}
+              </p>
+
+              <!-- Metadata Badges -->
+              <div class="mt-6 flex flex-wrap items-center gap-2 text-xs">
+                <div class="rounded-lg border border-border bg-surface px-3 py-1.5 font-semibold text-foreground flex items-center gap-1.5 shadow-2xs">
+                  <CalendarDays className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
+                  <span>تاريخ الصدور: {extra.year}</span>
+                </div>
+
+                <div class="rounded-lg border border-border bg-surface px-3 py-1.5 font-semibold text-foreground flex items-center gap-1.5 shadow-2xs">
+                  <Gamepad2 className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
+                  <span>المنصات: {extra.platforms || "PC"}</span>
+                </div>
+
+                <div class="rounded-lg border border-border bg-surface px-3 py-1.5 font-semibold text-foreground flex items-center gap-1.5 shadow-2xs">
+                  <Building2 className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
+                  <span>المطور: {extra.developer}</span>
+                </div>
+
+                <div class="rounded-lg border border-border bg-surface px-3 py-1.5 font-semibold text-foreground flex items-center gap-1.5 shadow-2xs">
+                  <Layers className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
+                  <span>النوع: {extra.genre}</span>
+                </div>
+
+                {(extra.officialUrl || game.steam_url || extra.steamUrl) ? (
+                  <a
+                    href={extra.officialUrl || game.steam_url || extra.steamUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="rounded-lg border border-border bg-surface px-3 py-1.5 font-semibold text-blue-600 dark:text-blue-400 hover:border-blue-500/40 flex items-center gap-1.5 transition-colors shadow-2xs"
+                  >
+                    <span>الموقع الرسمي / Steam</span>
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
+                ) : null}
+              </div>
+            </div>
+
+            <!-- Jump to download button -->
+            <div class="mt-8 pt-6 border-t border-border flex flex-wrap items-center gap-4">
+              <a
+                href="#download-section"
+                class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-bold text-white shadow-md shadow-blue-600/20 hover:bg-blue-500 transition-all duration-200 hover:scale-[1.02]"
+              >
+                <Download className="h-4 w-4" />
+                <span>الانتقال إلى رابط التحميل</span>
+                <ArrowDown className="h-4 w-4" />
+              </a>
+
+              <div class="text-xs text-muted font-medium">
+                تم التثبيت <span class="font-bold text-foreground tabular">{formatNumber(game.download_count ?? 0, locale)}</span> مرة من قِبل اللاعبين
+              </div>
+            </div>
+          </div>
+        </div>
+      </Container>
+    </section>
+
+    <!-- CONTENT BLOCKS -->
+    <Container className="mt-14 space-y-16">
+      <!-- Overview & Specifications -->
+      <GameOverviewSpec
+        client:load
+        game={game}
+        extra={extra}
+        locale={locale}
+      />
+
+      <!-- Arabic Localization Screenshots -->
+      <GameScreenshots
+        client:visible
+        title={title}
+        screenshots={extra.screenshots}
+      />
+
+      <!-- Download & Installation Instructions -->
+      <DownloadSection
+        client:load
+        gameTitle={title}
+        versions={versions}
+        extra={extra}
+        locale={locale}
+        isAuthenticated={true}
+        gameSlug={game.slug}
+      />
+
+      <!-- Support Widget -->
+      <SupportWidget client:visible />
+
+      <!-- Community Request -->
+      <CommunityRequest client:visible />
+    </Container>
+  </div>
+</BaseLayout>

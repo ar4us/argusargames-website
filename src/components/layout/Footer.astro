@@ -1,0 +1,61 @@
+---
+import { Wordmark } from "@/components/brand/logo";
+import { SocialLinks } from "@/components/layout/social-links";
+import { Container } from "@/components/ui/container";
+import type { SiteSettings } from "@/lib/types";
+import { getTranslations, type Locale } from "@/lib/i18n";
+
+interface Props {
+  settings: SiteSettings;
+  locale?: Locale;
+}
+
+const { settings, locale = "ar" } = Astro.props;
+const t = getTranslations(locale);
+const year = new Date().getFullYear();
+
+const nav = [
+  { href: `/${locale}/games`, label: t("nav.games") },
+  { href: `/${locale}/request`, label: t("nav.request") },
+  { href: `/${locale}/profile`, label: t("nav.profile") },
+];
+---
+
+<footer class="mt-auto border-t border-border bg-surface">
+  <Container className="grid gap-8 py-12 md:grid-cols-[1.5fr_1fr_1fr]">
+    <div>
+      <a href={`/${locale}`} class="inline-block">
+        <Wordmark name={settings.site_name_en || "Argus Games"} />
+      </a>
+      <p class="mt-3 max-w-sm text-sm text-muted leading-relaxed">
+        منصة عربية مستقلة تقدم تعريبات ألعاب الفيديو وشروحات التثبيت لمجتمع اللاعبين العرب.
+      </p>
+    </div>
+
+    <nav class="flex flex-col gap-2.5">
+      <p class="text-xs font-semibold uppercase tracking-wider text-foreground">
+        {t("footer.browse")}
+      </p>
+      {nav.map((item) => (
+        <a
+          href={item.href}
+          class="w-fit text-sm text-muted transition-colors hover:text-foreground"
+        >
+          {item.label}
+        </a>
+      ))}
+    </nav>
+
+    <div class="flex flex-col gap-2.5">
+      <p class="text-xs font-semibold uppercase tracking-wider text-foreground">
+        {t("footer.community")}
+      </p>
+      <SocialLinks settings={settings} size="sm" client:visible />
+    </div>
+  </Container>
+
+  <Container className="flex flex-col gap-2 border-t border-border py-6 text-xs text-muted sm:flex-row sm:items-center sm:justify-between">
+    <p>© {year} {settings.site_name_en || "Argus Games"} — جميع الحقوق محفوظة.</p>
+    <p>بنيت للاعبين العرب بكل حب</p>
+  </Container>
+</footer>

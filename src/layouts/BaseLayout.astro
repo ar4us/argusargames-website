@@ -1,0 +1,75 @@
+---
+import { ClientRouter } from "astro:transitions";
+import { Header } from "@/components/layout/header";
+import Footer from "@/components/layout/Footer.astro";
+import { dir, type Locale } from "@/lib/i18n";
+import { getSettings } from "@/lib/queries";
+import "@/styles/globals.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+  locale?: Locale;
+}
+
+const { title, description, locale = "ar" } = Astro.props;
+const currentDir = dir(locale);
+const settings = await getSettings();
+
+const pageTitle = title
+  ? `${title} — ${settings.site_name_en || "ArgusArGames"}`
+  : `${settings.site_name_en || "ArgusArGames"} — منصة تعريبات الألعاب العربية`;
+
+const pageDesc =
+  description ||
+  "منصة عربية تقدم لك باتشات تعريب احترافية، شروحات تثبيت خطوة بخطوة، وروابط تحميل مباشرة وسريعة لكافة المنصات.";
+---
+
+<!doctype html>
+<html lang={locale} dir={currentDir} class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={pageDesc} />
+
+    <!-- Google Fonts: Cairo & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Astro View Transitions for instant SPA-like navigation -->
+    <ClientRouter />
+
+    <!-- Early theme initialization -->
+    <script is:inline>
+      (function () {
+        try {
+          var t = localStorage.getItem("theme") || "system";
+          var d =
+            t === "dark" ||
+            (t === "system" &&
+              window.matchMedia("(prefers-color-scheme: dark)").matches);
+          var e = document.documentElement;
+          e.classList.toggle("dark", d);
+          e.dataset.theme = t;
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body class="flex min-h-dvh flex-col bg-background text-foreground antialiased selection:bg-blue-600 selection:text-white">
+    <Header
+      client:load
+      user={null}
+      brandName={settings.site_name_en || "ArgusArGames"}
+    />
+    <main class="flex-1">
+      <slot />
+    </main>
+    <Footer settings={settings} locale={locale} />
+  </body>
+</html>

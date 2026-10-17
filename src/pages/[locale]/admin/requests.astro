@@ -1,0 +1,108 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { AdminNav } from "@/components/admin/admin-nav";
+import { Container } from "@/components/ui/container";
+import { StatusSelect } from "@/components/admin/status-select";
+import { getAllRequests } from "@/lib/queries";
+import { formatDate, formatNumber } from "@/lib/utils";
+import { getTranslations, type Locale } from "@/lib/i18n";
+
+export function getStaticPaths() {
+  return [{ params: { locale: "ar" } }, { params: { locale: "en" } }];
+}
+
+const { locale = "ar" } = Astro.params as { locale: Locale };
+const t = getTranslations(locale);
+const requests = await getAllRequests();
+---
+
+<BaseLayout locale={locale} title={t("admin.requests.title")}>
+  <Container className="py-10">
+    <header class="mb-8 flex flex-wrap items-end justify-between gap-4">
+      <h1 class="text-2xl font-bold tracking-tight text-foreground">
+        {t("admin.title")}
+      </h1>
+      <a
+        href={`/${locale}`}
+        class="text-sm font-medium text-muted hover:text-blue-600"
+      >
+        {t("admin.backToSite")} →
+      </a>
+    </header>
+
+    <div class="grid gap-8 lg:grid-cols-[200px_1fr]">
+      <aside>
+        <AdminNav client:load />
+      </aside>
+
+      <main class="min-w-0">
+        <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+          <h2 class="text-xl font-semibold tracking-tight text-foreground">
+            {t("admin.requests.title")} ({requests.length})
+          </h2>
+        </div>
+
+        {requests.length === 0 ? (
+          <p class="rounded-2xl border border-dashed border-border-strong px-4 py-10 text-center text-sm text-muted">
+            {t("admin.requests.empty")}
+          </p>
+        ) : (
+          <ul class="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-surface">
+            {requests.map((req) => (
+              <li class="px-4 py-4 sm:px-5">
+                <div class="flex flex-wrap items-center gap-x-4 gap-y-2 sm:justify-between">
+                  <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <p class="font-semibold text-foreground">
+                        {req.game_name}
+                      </p>
+                      {req.request_type === "bug_report" || req.notes?.includes("نوع المشكلة:") ? (
+                        <span class="rounded-full bg-rose-500/10 px-2 py-0.5 text-[10px] font-bold text-rose-600 dark:text-rose-400 border border-rose-500/20">
+                          ⚠️ إبلاغ عن خطأ
+                        </span>
+                      ) : req.request_type === "update_request" || req.notes?.includes("طلب تحديث") ? (
+                        <span class="rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-bold text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                          🔄 طلب تحديث
+                        </span>
+                      ) : (
+                        <span class="rounded-full bg-blue-500/10 px-2 py-0.5 text-[10px] font-bold text-blue-600 dark:text-blue-400 border border-blue-500/20">
+                          ✨ تعريب جديد
+                        </span>
+                      )}
+                    </div>
+                    {req.game_url && (
+                      <a
+                        href={req.game_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="mt-1 block truncate text-xs text-blue-600 hover:underline"
+                        dir="ltr"
+                      >
+                        {req.game_url}
+                      </a>
+                    )}
+                    {req.notes && (
+                      <p class="mt-2 text-xs text-muted leading-relaxed whitespace-pre-wrap">
+                        {req.notes}
+                      </p>
+                    )}
+                    <p class="mt-2 text-xs text-muted flex items-center gap-2">
+                      <span class="tabular font-medium text-foreground">
+                        {formatNumber(req.vote_count, locale)} تصويت
+                      </span>
+                      <span>•</span>
+                      <span>{formatDate(req.created_at, locale)}</span>
+                    </p>
+                  </div>
+                  <div class="flex shrink-0 items-center gap-3">
+                    <StatusSelect client:load requestId={req.id} currentStatus={req.status} />
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </main>
+    </div>
+  </Container>
+</BaseLayout>
