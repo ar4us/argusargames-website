@@ -45,7 +45,7 @@ const pageDesc =
     <!-- Astro View Transitions for instant SPA-like navigation -->
     <ClientRouter />
 
-    <!-- Early theme initialization -->
+    <!-- Early theme & auth initialization -->
     <script is:inline>
       (function () {
         try {
@@ -57,6 +57,23 @@ const pageDesc =
           var e = document.documentElement;
           e.classList.toggle("dark", d);
           e.dataset.theme = t;
+
+          // Prevent guest button flash if user is already logged in
+          var hasUser = false;
+          if (localStorage.getItem("argus_cached_user")) {
+            hasUser = true;
+          } else {
+            for (var i = 0; i < localStorage.length; i++) {
+              var k = localStorage.key(i);
+              if (k && k.indexOf("sb-") === 0 && k.indexOf("-auth-token") !== -1) {
+                hasUser = true;
+                break;
+              }
+            }
+          }
+          if (hasUser) {
+            e.classList.add("user-logged-in");
+          }
         } catch (e) {}
       })();
     </script>
@@ -64,6 +81,7 @@ const pageDesc =
   <body class="flex min-h-dvh flex-col bg-background text-foreground antialiased selection:bg-blue-600 selection:text-white">
     <Header
       client:load
+      transition:persist="main-site-header"
       locale={locale}
       user={null}
       brandName={settings.site_name_en || "ArgusArGames"}

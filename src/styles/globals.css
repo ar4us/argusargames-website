@@ -184,3 +184,9 @@ iframe[src*="netlify"] {
   pointer-events: none !important;
 }
 
+/* Zero-flicker auth state */
+html.user-logged-in .auth-guest-links {
+  display: none !important;
+}
+
+
