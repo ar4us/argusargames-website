@@ -168,7 +168,14 @@ export async function getGames({
 }
 
 export async function getAllPublishedGames(): Promise<GameWithLatest[]> {
-  if (!isSupabaseConfigured()) return sanitizeGames(fallbackGames as unknown as GameWithLatest[]);
+  const getFallbackPublished = () =>
+    sanitizeGames(
+      (fallbackGames as unknown as GameWithLatest[]).filter(
+        (g: any) => g.published !== false
+      )
+    );
+
+  if (!isSupabaseConfigured()) return getFallbackPublished();
   try {
     const { data, error } = await supabase
       .from("games_with_latest")
@@ -176,11 +183,11 @@ export async function getAllPublishedGames(): Promise<GameWithLatest[]> {
       .eq("published", true)
       .order("created_at", { ascending: false });
     if (error || !data || data.length === 0) {
-      return sanitizeGames(fallbackGames as unknown as GameWithLatest[]);
+      return getFallbackPublished();
     }
     return sanitizeGames((data as GameWithLatest[]) ?? []);
   } catch {
-    return sanitizeGames(fallbackGames as unknown as GameWithLatest[]);
+    return getFallbackPublished();
   }
 }
 

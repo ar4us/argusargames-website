@@ -6,6 +6,8 @@ import { GameCard } from "@/components/games/game-card";
 import { Input, Select } from "@/components/ui/field";
 import type { GameWithLatest } from "@/lib/types";
 import { formatNumber } from "@/lib/utils";
+import { createClient } from "@/lib/supabase/client";
+import { sanitizeGames } from "@/lib/queries";
 
 interface GamesExplorerProps {
   initialGames: GameWithLatest[];
@@ -15,7 +17,27 @@ interface GamesExplorerProps {
 export function GamesExplorer({ initialGames, locale }: GamesExplorerProps) {
   const [q, setQ] = useState("");
   const [sort, setSort] = useState<"newest" | "downloads">("newest");
+  const [games, setGames] = useState<GameWithLatest[]>(() =>
+    initialGames.filter((g) => g.published !== false)
+  );
   const isAr = locale === "ar";
+
+  // Live query from Supabase to ensure any admin changes reflect immediately
+  useEffect(() => {
+    try {
+      const supabase = createClient();
+      supabase
+        .from("games_with_latest")
+        .select("*")
+        .eq("published", true)
+        .order("created_at", { ascending: false })
+        .then(({ data, error }) => {
+          if (!error && data && data.length > 0) {
+            setGames(sanitizeGames(data as GameWithLatest[]));
+          }
+        });
+    } catch {}
+  }, []);
 
   // Read initial query params from URL on mount
   useEffect(() => {
@@ -64,7 +86,7 @@ export function GamesExplorer({ initialGames, locale }: GamesExplorerProps) {
 
   // Filter and sort games in memory
   const filteredGames = useMemo(() => {
-    let list = [...initialGames];
+    let list = [...games];
     const term = q.trim().toLowerCase();
     if (term) {
       list = list.filter((g) => {
@@ -84,7 +106,7 @@ export function GamesExplorer({ initialGames, locale }: GamesExplorerProps) {
       );
     }
     return list;
-  }, [initialGames, q, sort]);
+  }, [games, q, sort]);
 
   return (
     <div className="space-y-8">

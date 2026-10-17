@@ -85,9 +85,10 @@ export function HeaderSearch({
   const results: GameSearchItem[] = trimmed
     ? (searchIndex as GameSearchItem[]).filter(
         (g) =>
-          (g.title_ar || "").toLowerCase().includes(trimmed) ||
-          (g.title_en || "").toLowerCase().includes(trimmed) ||
-          (g.slug || "").toLowerCase().includes(trimmed)
+          g.published !== false &&
+          ((g.title_ar || "").toLowerCase().includes(trimmed) ||
+            (g.title_en || "").toLowerCase().includes(trimmed) ||
+            (g.slug || "").toLowerCase().includes(trimmed))
       ).slice(0, 6)
     : [];
 

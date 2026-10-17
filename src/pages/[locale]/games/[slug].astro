@@ -68,7 +68,7 @@ const { locale = "ar", slug } = Astro.params as { locale: Locale; slug: string }
 const props = Astro.props as { game?: Game };
 const game = props.game || (await getGameBySlug(slug));
 
-if (!game) {
+if (!game || game.published === false) {
   return Astro.redirect(`/${locale}/games`);
 }
 

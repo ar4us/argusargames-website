@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useEffect, useTransition } from "react";
 import { ChevronDown, Loader2 } from "lucide-react";
 import { GameCard } from "@/components/games/game-card";
 import type { GameWithLatest } from "@/lib/types";
 import { fetchMoreGamesAction } from "@/lib/actions/games";
+import { createClient } from "@/lib/supabase/client";
+import { sanitizeGames } from "@/lib/queries";
 
 interface LatestGamesGridProps {
   initialGames: GameWithLatest[];
@@ -19,10 +21,29 @@ export function LatestGamesGrid({
   locale,
   perPage = 8,
 }: LatestGamesGridProps) {
-  const [games, setGames] = useState<GameWithLatest[]>(initialGames);
+  const [games, setGames] = useState<GameWithLatest[]>(() =>
+    initialGames.filter((g) => g.published !== false)
+  );
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(initialGames.length < total);
   const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    try {
+      const supabase = createClient();
+      supabase
+        .from("games_with_latest")
+        .select("*")
+        .eq("published", true)
+        .order("created_at", { ascending: false })
+        .limit(perPage)
+        .then(({ data, error }) => {
+          if (!error && data && data.length > 0) {
+            setGames(sanitizeGames(data as GameWithLatest[]));
+          }
+        });
+    } catch {}
+  }, [perPage]);
 
   const handleLoadMore = () => {
     const nextPage = page + 1;
