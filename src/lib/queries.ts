@@ -57,6 +57,10 @@ export async function getSettings(): Promise<SiteSettings> {
   return cachedSettingsPromise;
 }
 
+import fallbackGames from "@/data/fallback_games_with_latest.json";
+import fallbackVersions from "@/data/supabase_versions_backup.json";
+import fallbackUpcoming from "@/data/supabase_upcoming_backup.json";
+
 export async function getGames({
   q = "",
   sort = "newest",
@@ -64,14 +68,36 @@ export async function getGames({
   perPage = 12,
   includeUnpublished = false,
 }: GameListParams): Promise<GameListResult> {
-  const empty: GameListResult = {
-    games: [],
-    total: 0,
-    page,
-    perPage,
-    pageCount: 0,
+  const getFallbackResult = (): GameListResult => {
+    let list = [...(fallbackGames as unknown as GameWithLatest[])];
+    if (!includeUnpublished) list = list.filter((g) => g.published !== false);
+    const term = q.trim().toLowerCase();
+    if (term) {
+      list = list.filter(
+        (g) =>
+          g.title_ar.toLowerCase().includes(term) ||
+          g.title_en.toLowerCase().includes(term) ||
+          g.slug.toLowerCase().includes(term),
+      );
+    }
+    if (sort === "downloads") {
+      list.sort((a, b) => (b.download_count || 0) - (a.download_count || 0));
+    } else {
+      list.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    }
+    const total = list.length;
+    const from = (page - 1) * perPage;
+    const paginated = list.slice(from, from + perPage);
+    return {
+      games: paginated,
+      total,
+      page,
+      perPage,
+      pageCount: Math.max(1, Math.ceil(total / perPage)),
+    };
   };
-  if (!isSupabaseConfigured()) return empty;
+
+  if (!isSupabaseConfigured()) return getFallbackResult();
 
   try {
     let query = supabase
@@ -96,9 +122,11 @@ export async function getGames({
     const from = (page - 1) * perPage;
     const to = from + perPage - 1;
     const { data, count, error } = await query.range(from, to);
-    if (error) throw error;
+    if (error || !data || data.length === 0) {
+      return getFallbackResult();
+    }
 
-    const total = count ?? 0;
+    const total = count ?? data.length;
     return {
       games: (data as GameWithLatest[]) ?? [],
       total,
@@ -107,21 +135,24 @@ export async function getGames({
       pageCount: Math.max(1, Math.ceil(total / perPage)),
     };
   } catch {
-    return empty;
+    return getFallbackResult();
   }
 }
 
 export async function getAllPublishedGames(): Promise<GameWithLatest[]> {
-  if (!isSupabaseConfigured()) return [];
+  if (!isSupabaseConfigured()) return fallbackGames as unknown as GameWithLatest[];
   try {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("games_with_latest")
       .select("*")
       .eq("published", true)
       .order("created_at", { ascending: false });
+    if (error || !data || data.length === 0) {
+      return fallbackGames as unknown as GameWithLatest[];
+    }
     return (data as GameWithLatest[]) ?? [];
   } catch {
-    return [];
+    return fallbackGames as unknown as GameWithLatest[];
   }
 }
 
@@ -136,7 +167,10 @@ export async function getMostDownloaded(limit = 5): Promise<GameWithLatest[]> {
 }
 
 export async function getGameBySlug(slug: string): Promise<Game | null> {
-  if (!isSupabaseConfigured()) return null;
+  const findFallback = () =>
+    ((fallbackGames as unknown as Game[]).find((g) => g.slug === slug)) || null;
+
+  if (!isSupabaseConfigured()) return findFallback();
   try {
     const { data } = await supabase
       .from("games")
@@ -144,14 +178,17 @@ export async function getGameBySlug(slug: string): Promise<Game | null> {
       .eq("slug", slug)
       .eq("published", true)
       .maybeSingle();
-    return (data as Game) ?? null;
+    return (data as Game) ?? findFallback();
   } catch {
-    return null;
+    return findFallback();
   }
 }
 
 export async function getGameVersions(gameId: string): Promise<GameVersion[]> {
-  if (!isSupabaseConfigured()) return [];
+  const getFallbackVersions = () =>
+    (fallbackVersions as unknown as GameVersion[]).filter((v) => v.game_id === gameId);
+
+  if (!isSupabaseConfigured()) return getFallbackVersions();
   try {
     const { data } = await supabase
       .from("versions")
@@ -159,9 +196,10 @@ export async function getGameVersions(gameId: string): Promise<GameVersion[]> {
       .eq("game_id", gameId)
       .order("release_date", { ascending: false, nullsFirst: false })
       .order("created_at", { ascending: false });
-    return (data as GameVersion[]) ?? [];
+    if (data && data.length > 0) return data as GameVersion[];
+    return getFallbackVersions();
   } catch {
-    return [];
+    return getFallbackVersions();
   }
 }
 
@@ -181,17 +219,18 @@ export async function getTopRequests(limit = 20): Promise<LocalizationRequest[]>
 }
 
 export async function getUpcomingGames(): Promise<UpcomingGame[]> {
-  if (!isSupabaseConfigured()) return [];
+  const getFallbackUpcoming = () => fallbackUpcoming as unknown as UpcomingGame[];
+  if (!isSupabaseConfigured()) return getFallbackUpcoming();
   try {
     const { data, error } = await supabase
       .from("upcoming_games")
       .select("*")
       .order("progress_percentage", { ascending: false })
       .order("created_at", { ascending: false });
-    if (error) return [];
-    return (data as UpcomingGame[]) ?? [];
+    if (error || !data || data.length === 0) return getFallbackUpcoming();
+    return (data as UpcomingGame[]) ?? getFallbackUpcoming();
   } catch {
-    return [];
+    return getFallbackUpcoming();
   }
 }
 
@@ -259,8 +298,17 @@ export async function getUpcomingGameById(id: string): Promise<UpcomingGame | nu
 }
 
 export async function getStats(): Promise<AdminStats> {
-  if (!isSupabaseConfigured())
-    return { games: 0, versions: 0, requests: 0, downloads: 0 };
+  const fallbackStat: AdminStats = {
+    games: (fallbackGames as any[]).length,
+    versions: (fallbackVersions as any[]).length,
+    requests: 0,
+    downloads: (fallbackGames as any[]).reduce(
+      (sum, row) => sum + ((row.download_count as number) ?? 0),
+      0,
+    ),
+  };
+
+  if (!isSupabaseConfigured()) return fallbackStat;
   try {
     const [games, versions, requests, downloads] = await Promise.all([
       supabase.from("games").select("*", { count: "exact", head: true }),
@@ -272,13 +320,15 @@ export async function getStats(): Promise<AdminStats> {
       (sum, row) => sum + ((row.download_count as number) ?? 0),
       0,
     );
+    const gameCount = games.count ?? 0;
+    if (gameCount === 0) return fallbackStat;
     return {
-      games: games.count ?? 0,
-      versions: versions.count ?? 0,
+      games: gameCount,
+      versions: versions.count ?? fallbackStat.versions,
       requests: requests.count ?? 0,
-      downloads: downloadTotal,
+      downloads: downloadTotal || fallbackStat.downloads,
     };
   } catch {
-    return { games: 0, versions: 0, requests: 0, downloads: 0 };
+    return fallbackStat;
   }
 }

@@ -1,0 +1,211 @@
+[
+  {
+    "id": "ce2186ac-77cf-413b-bebc-e8afa09ccf27",
+    "game_id": "3ba59a21-49b1-4870-aac9-502248c2de40",
+    "version": "2.3",
+    "release_date": null,
+    "notes_ar": "إصدار RuntimeSafe v2.3 مع معالجة كاملة لخطوط الواجهة وتوافق تام.",
+    "notes_en": "Initial release",
+    "download_url": "https://argusargames.com/games/escape-from-duckov",
+    "download_count": 0,
+    "created_at": "2026-10-11T21:02:56.896604+00:00"
+  },
+  {
+    "id": "2a63e3ba-5fa2-4ca9-91fe-90c0b08b4778",
+    "game_id": "d534d8f1-a426-4f24-ab0c-b063ba8baf49",
+    "version": "1.0",
+    "release_date": null,
+    "notes_ar": "يتضمن ملفات تثبيت وإلغاء تثبيت بنقرة واحدة.",
+    "notes_en": "Initial release",
+    "download_url": "https://argusargames.com/games/well-dweller",
+    "download_count": 0,
+    "created_at": "2026-10-11T21:02:59.801163+00:00"
+  },
+  {
+    "id": "58d051e9-d968-4530-b0ff-c62b2adb4e1e",
+    "game_id": "300375da-d4a0-44b6-bef3-49c7ebf29bfa",
+    "version": "1.0",
+    "release_date": null,
+    "notes_ar": "ملف Bloodstained_Arabic_Full_P.pak جاهز للوضع في مجلد ~mods.",
+    "notes_en": "Initial release",
+    "download_url": "https://argusargames.com/games/bloodstained-ritual-of-the-night",
+    "download_count": 0,
+    "created_at": "2026-10-11T21:03:00.953281+00:00"
+  },
+  {
+    "id": "6d80eca1-7086-45eb-bb67-efdf49444c81",
+    "game_id": "d0e361ac-e59d-4010-b214-31aa5ef921e4",
+    "version": "v1.0",
+    "release_date": "2026-10-12",
+    "notes_ar": null,
+    "notes_en": "{\"platform\":\"PC (Windows)\",\"fileSize\":\"89\",\"notes\":\"\"}",
+    "download_url": "https://files.argusargames.com/Backseat_Arabic_Patch_v1.0-ArgusOS.zip",
+    "download_count": 2,
+    "created_at": "2026-10-12T15:56:39.671218+00:00"
+  },
+  {
+    "id": "8cdc39eb-b98a-425b-adc6-c3c46f42bf5c",
+    "game_id": "282b1bca-97f8-437c-a805-2089112446a4",
+    "version": "1",
+    "release_date": "2026-10-12",
+    "notes_ar": null,
+    "notes_en": "{\"platform\":\"PC (Windows)\",\"fileSize\":\"15\",\"notes\":\"\"}",
+    "download_url": "https://files.argusargames.com/Guacamelee2%20Arabic%20ArgusOs.rar",
+    "download_count": 0,
+    "created_at": "2026-10-12T21:56:16.43983+00:00"
+  },
+  {
+    "id": "49d127eb-0af0-42e7-8ae1-0800997f69ea",
+    "game_id": "8c08882a-a1ec-448e-a622-f09ea88d6d3f",
+    "version": "1.5",
+    "release_date": "2026-10-13",
+    "notes_ar": null,
+    "notes_en": "{\"platform\":\"PC (Windows)\",\"fileSize\":\"151\",\"notes\":\"\"}",
+    "download_url": "https://files.argusargames.com/Silent%20Hill%20Townfall%20Arabic%20V1.5.zip",
+    "download_count": 0,
+    "created_at": "2026-10-13T05:59:37.999016+00:00"
+  },
+  {
+    "id": "edd31c02-dffd-4e18-90ef-ea1ea307da62",
+    "game_id": "86ee6a12-6524-4384-b460-20e8a75ba9ac",
+    "version": "1",
+    "release_date": "2026-10-13",
+    "notes_ar": null,
+    "notes_en": "{\"platform\":\"PC (Windows)\",\"fileSize\":\"1\",\"notes\":\"\"}",
+    "download_url": "https://files.argusargames.com/Bio-Gun_Arabic_Patch_v1.0-ArgusOs.zip",
+    "download_count": 0,
+    "created_at": "2026-10-13T11:05:37.620655+00:00"
+  },
+  {
+    "id": "fadbad98-e148-450f-938b-f7bfe18da6a4",
+    "game_id": "30ff25e0-5018-4182-bf14-966eba842e3c",
+    "version": "1",
+    "release_date": "2026-10-12",
+    "notes_ar": null,
+    "notes_en": "{\"platform\":\"PC (Windows)\",\"fileSize\":\"3.28\",\"notes\":\"\"}",
+    "download_url": "https://files.argusargames.com/Welcome_to_Elderfield_Arabic_Patch_v1.0.zip",
+    "download_count": 1,
+    "created_at": "2026-10-12T19:51:51.135527+00:00"
+  },
+  {
+    "id": "fbc672f4-fb7f-4b06-9e12-470be7334a11",
+    "game_id": "1bdc5775-7044-4ac8-9122-a8eae07b4dbe",
+    "version": "1.4.2",
+    "release_date": "2026-10-12",
+    "notes_ar": null,
+    "notes_en": "{\"platform\":\"PC (Windows)\",\"fileSize\":\"7\",\"notes\":\"\"}",
+    "download_url": "https://files.argusargames.com/Control_Resonant_Arabic_Full_Patch_v1.4.2-ArgusOs.rar",
+    "download_count": 1,
+    "created_at": "2026-10-12T21:43:25.446905+00:00"
+  },
+  {
+    "id": "53b60208-eecf-419e-9343-ff348a0423f9",
+    "game_id": "ffd09d5b-5e4a-42d7-95a3-bb5e449845ad",
+    "version": "1",
+    "release_date": "2026-10-12",
+    "notes_ar": null,
+    "notes_en": "{\"platform\":\"PC (Windows)\",\"fileSize\":\"1\",\"notes\":\"\"}",
+    "download_url": "https://files.argusargames.com/Dressmaker%20Arabic%20V4.1%20.rar",
+    "download_count": 3,
+    "created_at": "2026-10-12T20:22:49.264004+00:00"
+  },
+  {
+    "id": "7b020369-1b9d-439a-9003-be5724548150",
+    "game_id": "f4082051-965d-4b54-b4bd-a84d5bd7231b",
+    "version": "1",
+    "release_date": "2026-10-13",
+    "notes_ar": null,
+    "notes_en": "{\"platform\":\"PC (Windows)\",\"fileSize\":\"108\",\"notes\":\"\"}",
+    "download_url": "https://files.argusargames.com/WheelMates_Arabic_Manual_Install.zip",
+    "download_count": 1,
+    "created_at": "2026-10-13T20:47:53.604036+00:00"
+  },
+  {
+    "id": "3c1a3c61-ab56-4563-994f-26087bf8db4d",
+    "game_id": "1242999c-84e0-4e48-8166-b8038a92abac",
+    "version": "1",
+    "release_date": "2026-10-12",
+    "notes_ar": null,
+    "notes_en": "{\"platform\":\"PC (Windows)\",\"fileSize\":\"2\",\"notes\":\"\"}",
+    "download_url": "https://files.argusargames.com/End_of_Abyss_Arabic_Patch_ArgusOs.zip",
+    "download_count": 2,
+    "created_at": "2026-10-12T20:09:11.77325+00:00"
+  },
+  {
+    "id": "219d5b55-07f5-4c00-a931-a5d5b5c9aa32",
+    "game_id": "b6002ef2-52fb-41b2-9fa4-82b825646445",
+    "version": "1",
+    "release_date": "2026-10-13",
+    "notes_ar": null,
+    "notes_en": "{\"platform\":\"PC (Windows)\",\"fileSize\":\"1\",\"notes\":\"\"}",
+    "download_url": "https://files.argusargames.com/Forever_Ago_Arabic_Patch_v1.0-ArgusOs.zip",
+    "download_count": 7,
+    "created_at": "2026-10-13T06:43:11.079498+00:00"
+  },
+  {
+    "id": "85427e1a-a445-4455-8955-eed15634b5bd",
+    "game_id": "212cc524-e2be-4032-9c68-ec5cfaf2a0dd",
+    "version": "1",
+    "release_date": "2026-10-14",
+    "notes_ar": null,
+    "notes_en": "{\"platform\":\"PC (Windows)\",\"fileSize\":\"1\",\"notes\":\"\"}",
+    "download_url": "https://files.argusargames.com/Twilight_Monk_Arabic_Patch_ArgusOs.zip",
+    "download_count": 4,
+    "created_at": "2026-10-14T14:10:59.383047+00:00"
+  },
+  {
+    "id": "bde466ce-5d49-44be-8ba7-777938035017",
+    "game_id": "ad8742d9-d1c5-4fa9-89b0-02d61fcf2719",
+    "version": "1.0",
+    "release_date": "2026-10-14",
+    "notes_ar": null,
+    "notes_en": "{\"platform\":\"PC (Windows)\",\"fileSize\":\"80\",\"notes\":\"\"}",
+    "download_url": "https://files.argusargames.com/Mad_Father_Arabic_DropIn_v1.10_ArgusOs.zip",
+    "download_count": 1,
+    "created_at": "2026-10-14T18:09:49.632606+00:00"
+  },
+  {
+    "id": "0232926a-9e1b-4d9a-b1b8-35f593035653",
+    "game_id": "430c9ee3-d3c4-4d87-8f58-298e718b0fe7",
+    "version": "1.2",
+    "release_date": "2026-10-12",
+    "notes_ar": null,
+    "notes_en": "{\"platform\":\"PC (Windows)\",\"fileSize\":\"125\",\"notes\":\"\"}",
+    "download_url": "https://files.argusargames.com/SilverPines_Arabic_Steam_Update_v1.2.zip",
+    "download_count": 21,
+    "created_at": "2026-10-12T21:39:17.807488+00:00"
+  },
+  {
+    "id": "5812c737-d0c9-438f-8bbb-44b816b891f4",
+    "game_id": "d30f4d07-59d3-4841-ac8e-70f55572c62d",
+    "version": "1",
+    "release_date": "2026-10-12",
+    "notes_ar": null,
+    "notes_en": "{\"platform\":\"PC (Windows)\",\"fileSize\":\"110\",\"notes\":\"\"}",
+    "download_url": "https://files.argusargames.com/EchoWeaver_Arabic_Patch_v1.0.zip",
+    "download_count": 1,
+    "created_at": "2026-10-12T20:01:35.764643+00:00"
+  },
+  {
+    "id": "6437b898-2cf2-4bc6-a374-1ba78a7b6d8b",
+    "game_id": "c17fa9d4-ab05-4f89-982b-1255cce55140",
+    "version": "1",
+    "release_date": "2026-10-13",
+    "notes_ar": null,
+    "notes_en": "{\"platform\":\"PC (Windows)\",\"fileSize\":\"180\",\"notes\":\"\"}",
+    "download_url": "https://files.argusargames.com/INSIDE_Arabic_Patch_PC_ArgusOs.zip",
+    "download_count": 1,
+    "created_at": "2026-10-13T06:15:55.645342+00:00"
+  },
+  {
+    "id": "12d0185a-3486-4d37-85ee-8924c5d60330",
+    "game_id": "11f48b17-ba75-410f-841b-f4e10602a12f",
+    "version": "1",
+    "release_date": "2026-10-12",
+    "notes_ar": null,
+    "notes_en": "{\"platform\":\"PC (Windows)\",\"fileSize\":\"5\",\"notes\":\"\"}",
+    "download_url": "https://files.argusargames.com/The_Seance_of_Blake_Manor_Arabic_Patch_ArgusOs.zip",
+    "download_count": 3,
+    "created_at": "2026-10-12T19:39:45.656773+00:00"
+  }
+]
