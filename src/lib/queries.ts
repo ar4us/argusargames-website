@@ -61,6 +61,34 @@ import fallbackGames from "@/data/fallback_games_with_latest.json";
 import fallbackVersions from "@/data/supabase_versions_backup.json";
 import fallbackUpcoming from "@/data/supabase_upcoming_backup.json";
 
+export function sanitizeGame<T extends any>(g: T): T {
+  if (!g || typeof g !== "object") return g;
+  const clone = { ...g } as any;
+  if (clone.cover_url && typeof clone.cover_url === "string" && clone.cover_url.startsWith("data:")) {
+    clone.cover_url = `/images/covers/${clone.slug}.webp`;
+  }
+  if (clone.description_en && typeof clone.description_en === "string" && clone.description_en.includes("data:")) {
+    try {
+      const parsed = JSON.parse(clone.description_en);
+      if (Array.isArray(parsed.screenshots)) {
+        parsed.screenshots = parsed.screenshots.map((s: string, idx: number) => {
+          if (typeof s === "string" && s.startsWith("data:")) {
+            return `/images/screenshots/${clone.slug}-${idx + 1}.webp`;
+          }
+          return s;
+        });
+        clone.description_en = JSON.stringify(parsed);
+      }
+    } catch {}
+  }
+  return clone as T;
+}
+
+export function sanitizeGames<T extends any[]>(list: T): T {
+  if (!Array.isArray(list)) return list;
+  return list.map(sanitizeGame) as T;
+}
+
 export async function getGames({
   q = "",
   sort = "newest",
@@ -128,7 +156,7 @@ export async function getGames({
 
     const total = count ?? data.length;
     return {
-      games: (data as GameWithLatest[]) ?? [],
+      games: sanitizeGames((data as GameWithLatest[]) ?? []),
       total,
       page,
       perPage,
@@ -140,7 +168,7 @@ export async function getGames({
 }
 
 export async function getAllPublishedGames(): Promise<GameWithLatest[]> {
-  if (!isSupabaseConfigured()) return fallbackGames as unknown as GameWithLatest[];
+  if (!isSupabaseConfigured()) return sanitizeGames(fallbackGames as unknown as GameWithLatest[]);
   try {
     const { data, error } = await supabase
       .from("games_with_latest")
@@ -148,11 +176,11 @@ export async function getAllPublishedGames(): Promise<GameWithLatest[]> {
       .eq("published", true)
       .order("created_at", { ascending: false });
     if (error || !data || data.length === 0) {
-      return fallbackGames as unknown as GameWithLatest[];
+      return sanitizeGames(fallbackGames as unknown as GameWithLatest[]);
     }
-    return (data as GameWithLatest[]) ?? [];
+    return sanitizeGames((data as GameWithLatest[]) ?? []);
   } catch {
-    return fallbackGames as unknown as GameWithLatest[];
+    return sanitizeGames(fallbackGames as unknown as GameWithLatest[]);
   }
 }
 
@@ -168,7 +196,7 @@ export async function getMostDownloaded(limit = 5): Promise<GameWithLatest[]> {
 
 export async function getGameBySlug(slug: string): Promise<Game | null> {
   const findFallback = () =>
-    ((fallbackGames as unknown as Game[]).find((g) => g.slug === slug)) || null;
+    sanitizeGame((fallbackGames as unknown as Game[]).find((g) => g.slug === slug) || null);
 
   if (!isSupabaseConfigured()) return findFallback();
   try {
@@ -178,7 +206,7 @@ export async function getGameBySlug(slug: string): Promise<Game | null> {
       .eq("slug", slug)
       .eq("published", true)
       .maybeSingle();
-    return (data as Game) ?? findFallback();
+    return sanitizeGame((data as Game) ?? findFallback());
   } catch {
     return findFallback();
   }
@@ -242,29 +270,32 @@ export interface AdminStats {
 }
 
 export async function getAllGamesForAdmin(): Promise<Game[]> {
-  if (!isSupabaseConfigured()) return [];
+  if (!isSupabaseConfigured()) return sanitizeGames(fallbackGames as unknown as Game[]);
   try {
     const { data } = await supabase
       .from("games")
       .select("*")
       .order("created_at", { ascending: false });
-    return (data as Game[]) ?? [];
+    return sanitizeGames((data as Game[]) ?? (fallbackGames as unknown as Game[]));
   } catch {
-    return [];
+    return sanitizeGames(fallbackGames as unknown as Game[]);
   }
 }
 
 export async function getGameById(id: string): Promise<Game | null> {
-  if (!isSupabaseConfigured()) return null;
+  const findFallback = () =>
+    sanitizeGame((fallbackGames as unknown as Game[]).find((g) => g.id === id) || null);
+
+  if (!isSupabaseConfigured()) return findFallback();
   try {
     const { data } = await supabase
       .from("games")
       .select("*")
       .eq("id", id)
       .maybeSingle();
-    return (data as Game) ?? null;
+    return sanitizeGame((data as Game) ?? findFallback());
   } catch {
-    return null;
+    return findFallback();
   }
 }
 

@@ -18,6 +18,12 @@ const [top, gamesRes] = await Promise.all([
   getTopRequests(20),
   getGames({ perPage: 100 }),
 ]);
+
+const selectGames = gamesRes.games.map((g) => ({
+  id: g.id,
+  title_ar: g.title_ar,
+  title_en: g.title_en,
+}));
 ---
 
 <BaseLayout
@@ -44,7 +50,7 @@ const [top, gamesRes] = await Promise.all([
               إرسال طلب جديد أو بلاغ
             </h2>
             <div class="mt-4">
-              <RequestForm client:load games={gamesRes.games} />
+              <RequestForm client:load games={selectGames as any} />
             </div>
           </Card>
         </div>
