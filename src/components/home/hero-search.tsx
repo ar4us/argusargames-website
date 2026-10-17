@@ -14,8 +14,12 @@ export function HeroSearch() {
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    const query = value.trim() ? { q: value.trim() } : undefined;
-    router.push({ pathname: "/games", query });
+    const term = value.trim();
+    if (term) {
+      router.push({ pathname: "/games", query: { q: term } });
+    } else {
+      router.push("/games");
+    }
   };
 
   return (

@@ -81,6 +81,7 @@ export function DownloadSection({
                 latestVersion ? (
                   <DownloadButton
                     versionId={latestVersion.id}
+                    downloadUrl={latestVersion.download_url}
                     count={latestVersion.download_count}
                     locale={locale}
                     label="تحميل التعريب (رابط مباشر)"

@@ -51,6 +51,7 @@ function VersionRow({
 
         <DownloadButton
           versionId={version.id}
+          downloadUrl={version.download_url}
           count={version.download_count}
           locale={locale}
           label={featured ? t("downloadNow") : t("download")}

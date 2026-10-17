@@ -48,12 +48,19 @@ export function usePathname(): string {
 }
 
 export function useRouter() {
+  const locale = useLocale();
   return {
-    push: (url: string) => {
-      if (typeof window !== "undefined") window.location.href = url;
+    push: (target: any) => {
+      if (typeof window !== "undefined") {
+        const url = formatHref(target, locale);
+        window.location.href = url;
+      }
     },
-    replace: (url: string) => {
-      if (typeof window !== "undefined") window.location.replace(url);
+    replace: (target: any) => {
+      if (typeof window !== "undefined") {
+        const url = formatHref(target, locale);
+        window.location.replace(url);
+      }
     },
     refresh: () => {
       // Safe no-op in Astro static site to prevent infinite reload loops

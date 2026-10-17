@@ -1,10 +1,8 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import { GameGrid } from "@/components/games/game-grid";
-import { GamesToolbar } from "@/components/games/games-toolbar";
+import { GamesExplorer } from "@/components/games/games-explorer";
 import Container from "@/components/ui/Container.astro";
-import { getGames } from "@/lib/queries";
-import { formatNumber } from "@/lib/utils";
+import { getAllPublishedGames } from "@/lib/queries";
 import { getTranslations, type Locale } from "@/lib/i18n";
 
 export function getStaticPaths() {
@@ -14,11 +12,7 @@ export function getStaticPaths() {
 const { locale = "ar" } = Astro.params as { locale: Locale };
 const t = getTranslations(locale);
 
-const { games, total } = await getGames({
-  sort: "newest",
-  page: 1,
-  perPage: 36,
-});
+const games = await getAllPublishedGames();
 ---
 
 <BaseLayout
@@ -27,24 +21,13 @@ const { games, total } = await getGames({
   description={t("games.subtitle")}
 >
   <Container className="py-12">
-    <header className="mb-8">
+    <header class="mb-8">
       <h1 class="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
         {t("games.title")}
       </h1>
       <p class="mt-2 text-muted">{t("games.subtitle")}</p>
     </header>
 
-    <div class="mb-6">
-      <GamesToolbar client:load initialQ="" initialSort="newest" />
-    </div>
-
-    <p class="mb-6 text-sm text-muted" aria-live="polite">
-      {t("common.results")}:{" "}
-      <span class="tabular font-medium text-foreground">
-        {formatNumber(total, locale)}
-      </span>
-    </p>
-
-    <GameGrid client:load games={games} locale={locale} />
+    <GamesExplorer client:load initialGames={games} locale={locale} />
   </Container>
 </BaseLayout>

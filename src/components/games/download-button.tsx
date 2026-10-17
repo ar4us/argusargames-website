@@ -16,6 +16,7 @@ export function DownloadButton({
   size = "md",
   className,
   showCount = true,
+  downloadUrl,
 }: {
   versionId: string;
   count: number;
@@ -25,6 +26,7 @@ export function DownloadButton({
   size?: "sm" | "md" | "lg";
   className?: string;
   showCount?: boolean;
+  downloadUrl?: string;
 }) {
   const [downloading, setDownloading] = useState(false);
   const [currentCount, setCurrentCount] = useState(count);
@@ -35,20 +37,25 @@ export function DownloadButton({
     setDownloading(true);
 
     try {
-      // 1. Fetch download URL
-      const { data: ver, error } = await supabase
-        .from("versions")
-        .select("id, game_id, download_url, download_count")
-        .eq("id", versionId)
-        .maybeSingle();
+      let targetUrl = downloadUrl;
 
-      if (error || !ver?.download_url) {
+      // If no direct downloadUrl passed, fetch from Supabase
+      if (!targetUrl) {
+        const { data: ver } = await supabase
+          .from("versions")
+          .select("id, game_id, download_url, download_count")
+          .eq("id", versionId)
+          .maybeSingle();
+        targetUrl = ver?.download_url;
+      }
+
+      if (!targetUrl) {
         alert("عذراً، رابط التحميل غير متاح حالياً.");
         setDownloading(false);
         return;
       }
 
-      // 2. Increment count client-side directly
+      // Increment count client-side directly
       try {
         await supabase.rpc("increment_version_download", {
           p_version_id: versionId,
@@ -57,12 +64,12 @@ export function DownloadButton({
 
       setCurrentCount((prev) => prev + 1);
 
-      // 3. Trigger direct download / open URL
-      window.location.href = ver.download_url;
+      // Trigger direct download / open URL in new tab or direct
+      window.open(targetUrl, "_blank", "noopener,noreferrer");
     } catch (err) {
       console.error("Download error:", err);
     } finally {
-      setTimeout(() => setDownloading(false), 2000);
+      setTimeout(() => setDownloading(false), 1500);
     }
   };
 
