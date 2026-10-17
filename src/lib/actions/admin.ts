@@ -12,10 +12,11 @@ export async function saveGameAction(
   const id = String(formData.get("id") ?? "").trim();
   const titleAr = String(formData.get("title_ar") ?? "").trim();
   const titleEn = String(formData.get("title_en") ?? "").trim();
-  const descriptionAr = String(formData.get("description_ar") ?? "").trim();
+  const descriptionAr = String(formData.get("description_ar") || formData.get("about_game") || "").trim();
   const coverUrl = String(formData.get("cover_url") ?? "").trim();
-  const steamUrl = String(formData.get("steam_url") ?? "").trim();
-  const published = formData.get("published") === "on";
+  const steamUrl = String(formData.get("steam_url") || formData.get("official_url") || "").trim();
+  const publishedVal = formData.get("published");
+  const published = publishedVal === "on" || publishedVal === "true" || publishedVal === "1";
   let slug = slugify(String(formData.get("slug") ?? "").trim() || titleEn);
 
   if (!titleAr || !titleEn) return { ok: false, error: "required" };

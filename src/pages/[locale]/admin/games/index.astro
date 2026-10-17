@@ -8,6 +8,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/card";
 import { Plus, Link2 } from "lucide-react";
 import { getAllGamesForAdmin } from "@/lib/queries";
+import { AdminGamesList } from "@/components/admin/admin-games-list";
 import { getTranslations, type Locale } from "@/lib/i18n";
 
 export function getStaticPaths() {
@@ -52,56 +53,7 @@ const games = await getAllGamesForAdmin();
           </a>
         </div>
 
-        {games.length === 0 ? (
-          <p class="rounded-2xl border border-dashed border-border-strong px-4 py-10 text-center text-sm text-muted">
-            {t("admin.games.empty")}
-          </p>
-        ) : (
-          <ul class="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-surface">
-            {games.map((game) => (
-              <li class="flex flex-wrap items-center gap-4 px-4 py-3 sm:flex-nowrap">
-                <span class="relative h-12 w-9 shrink-0 overflow-hidden rounded-md bg-surface-2">
-                  {game.cover_url ? (
-                    <img
-                      src={game.cover_url}
-                      alt=""
-                      loading="lazy"
-                      class="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <LogoMark className="absolute inset-0 m-auto h-5 w-5 opacity-40" />
-                  )}
-                </span>
-                <div class="min-w-0 flex-1">
-                  <p class="truncate font-medium text-foreground">
-                    {game.title_ar}
-                    {game.title_en && game.title_en !== game.title_ar ? (
-                      <span class="font-normal text-muted">
-                        {" "}· {game.title_en}
-                      </span>
-                    ) : null}
-                  </p>
-                  <p class="tabular truncate text-xs text-muted" dir="ltr">
-                    /games/{game.slug}
-                  </p>
-                </div>
-                <Badge tone={game.published ? "success" : "neutral"}>
-                  {game.published ? t("common.yes") : t("common.no")}
-                </Badge>
-                <div class="flex shrink-0 items-center gap-2">
-                  <a
-                    href={`/${locale}/admin/games/${game.id}`}
-                    class={buttonVariants({ variant: "secondary", size: "sm" })}
-                  >
-                    <Link2 className="h-3.5 w-3.5" />
-                    <span>{t("admin.games.edit")}</span>
-                  </a>
-                  <DeleteGameButton client:load gameId={game.id} locale={locale} />
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
+        <AdminGamesList client:load initialGames={games} locale={locale} />
       </main>
     </div>
   </Container>

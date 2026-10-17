@@ -40,7 +40,7 @@ export function GameLiveGuard({
       supabase
         .from("games")
         .select("published")
-        .eq("id", gameId)
+        .or(`id.eq.${gameId},slug.eq.${slug}`)
         .maybeSingle()
         .then(({ data }) => {
           if (data && typeof data.published === "boolean") {
@@ -48,7 +48,7 @@ export function GameLiveGuard({
           }
         });
     } catch {}
-  }, [gameId]);
+  }, [gameId, slug]);
 
   // If published: show normal game page
   if (published) {

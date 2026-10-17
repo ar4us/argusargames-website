@@ -1,15 +1,16 @@
 "use client";
 
-import { Trash2, Upload, Plus, Image as ImageIcon, Film, Gamepad2, Sparkles, CheckCircle2, AlertCircle, Download, Terminal, Wrench } from "lucide-react";
+import { Trash2, Upload, Plus, Image as ImageIcon, Film, Gamepad2, Sparkles, CheckCircle2, AlertCircle, Download, Terminal, Wrench, EyeOff } from "lucide-react";
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
-import { useActionState, useRef, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { saveGameAction } from "@/lib/actions/admin";
 import { initialFormState } from "@/lib/action-types";
 import { Button, Spinner } from "@/components/ui/button";
 import { Checkbox, FieldError, Input, Label, Textarea } from "@/components/ui/field";
 import type { Game } from "@/lib/types";
 import { getGameExtra } from "@/lib/game-details";
+import { createClient } from "@/lib/supabase/client";
 
 interface ScreenshotItem {
   url: string;
@@ -88,6 +89,26 @@ export function GameForm({
 
   // Extract initial values from game or existing defaults
   const extra = game ? getGameExtra(game.slug, game.description_en) : null;
+
+  // Real-time controlled published state
+  const [isPublished, setIsPublished] = useState<boolean>(Boolean(game ? game.published : true));
+
+  // Live query from Supabase on mount to ensure form always matches live database
+  useEffect(() => {
+    if (!game?.id) return;
+    try {
+      const sb = createClient();
+      sb.from("games")
+        .select("published")
+        .eq("id", game.id)
+        .maybeSingle()
+        .then(({ data }) => {
+          if (data && typeof data.published === "boolean") {
+            setIsPublished(data.published);
+          }
+        });
+    } catch {}
+  }, [game?.id]);
 
   const [coverUrl, setCoverUrl] = useState(game?.cover_url ?? "");
   const [uploadingCover, setUploadingCover] = useState(false);
@@ -248,7 +269,7 @@ export function GameForm({
     <form action={formAction} className="space-y-6">
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="id" value={game?.id ?? ""} />
-      {live ? <input type="hidden" name="published" value="on" /> : null}
+      <input type="hidden" name="published" value={isPublished ? "on" : "off"} />
       <input type="hidden" name="cover_url" value={coverUrl} />
       <input
         type="hidden"
@@ -718,18 +739,50 @@ export function GameForm({
           />
         </div>
 
-        {!live && (
-          <div className="flex items-center gap-2 pt-5 sm:pt-6">
-            <Checkbox
-              id="published"
-              name="published"
-              defaultChecked={game?.published ?? true}
-            />
-            <Label htmlFor="published" className="cursor-pointer font-medium">
-              {t("published")}
-            </Label>
-          </div>
-        )}
+        <div className="pt-2 sm:pt-4">
+          <Label className="block mb-2 font-semibold">{t("published")}</Label>
+          <button
+            type="button"
+            onClick={() => setIsPublished(!isPublished)}
+            className={`w-full flex items-center justify-between gap-3 p-3 rounded-xl border transition-all text-start cursor-pointer ${
+              isPublished
+                ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400"
+                : "bg-surface-2/80 border-border text-muted hover:text-foreground"
+            }`}
+          >
+            <div className="flex items-center gap-2.5">
+              <div
+                className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${
+                  isPublished
+                    ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400"
+                    : "bg-surface text-muted"
+                }`}
+              >
+                {isPublished ? <CheckCircle2 className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs sm:text-sm font-bold truncate">
+                  {isPublished ? "منشورة ومتاحة لجميع الزوار" : "مسودة مخفية عن الزوار"}
+                </p>
+                <p className="text-[11px] text-muted truncate">
+                  {isPublished ? "تظهر بالبحث والقوائم ورابطها متاح" : "تظهر فقط للإدارة للمعاينة والتعديل"}
+                </p>
+              </div>
+            </div>
+
+            <div
+              className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${
+                isPublished ? "bg-emerald-500" : "bg-neutral-600/40"
+              }`}
+            >
+              <span
+                className={`absolute top-1 block h-4 w-4 rounded-full bg-white shadow-sm transition-all ${
+                  isPublished ? "right-1" : "left-1"
+                }`}
+              />
+            </div>
+          </button>
+        </div>
       </div>
 
       <FieldError>
