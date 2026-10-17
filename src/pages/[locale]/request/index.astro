@@ -2,8 +2,8 @@
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { RequestForm } from "@/components/request/request-form";
 import { RequestList } from "@/components/request/request-list";
-import { Card } from "@/components/ui/card";
-import { Container } from "@/components/ui/container";
+import Card from "@/components/ui/Card.astro";
+import Container from "@/components/ui/Container.astro";
 import { getGames, getTopRequests } from "@/lib/queries";
 import { getTranslations, type Locale } from "@/lib/i18n";
 

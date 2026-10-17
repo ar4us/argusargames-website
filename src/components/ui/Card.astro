@@ -1,0 +1,15 @@
+---
+import { cn } from "@/lib/utils";
+
+interface Props {
+  className?: string;
+  class?: string;
+  [key: string]: any;
+}
+
+const { className, class: classProp, ...props } = Astro.props;
+---
+
+<div class={cn("rounded-2xl border border-border bg-surface", className, classProp)} {...props}>
+  <slot />
+</div>

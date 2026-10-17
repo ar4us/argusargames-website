@@ -36,18 +36,25 @@ export interface GameListResult {
   pageCount: number;
 }
 
+let cachedSettingsPromise: Promise<SiteSettings> | null = null;
+
 export async function getSettings(): Promise<SiteSettings> {
   if (!isSupabaseConfigured()) return DEFAULT_SETTINGS;
-  try {
-    const { data } = await supabase
-      .from("site_settings")
-      .select("*")
-      .eq("id", 1)
-      .maybeSingle();
-    return (data as SiteSettings) ?? DEFAULT_SETTINGS;
-  } catch {
-    return DEFAULT_SETTINGS;
+  if (!cachedSettingsPromise) {
+    cachedSettingsPromise = (async () => {
+      try {
+        const { data } = await supabase
+          .from("site_settings")
+          .select("*")
+          .eq("id", 1)
+          .maybeSingle();
+        return (data as SiteSettings) ?? DEFAULT_SETTINGS;
+      } catch {
+        return DEFAULT_SETTINGS;
+      }
+    })();
   }
+  return cachedSettingsPromise;
 }
 
 export async function getGames({

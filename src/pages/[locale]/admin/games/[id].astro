@@ -1,11 +1,12 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { AdminNav } from "@/components/admin/admin-nav";
-import { Container } from "@/components/ui/container";
+import Container from "@/components/ui/Container.astro";
 import { DeleteVersionButton } from "@/components/admin/confirm-delete";
 import { GameForm } from "@/components/admin/game-form";
 import { VersionForm } from "@/components/admin/version-form";
-import { Card, Badge } from "@/components/ui/card";
+import Card from "@/components/ui/Card.astro";
+import { Badge } from "@/components/ui/card";
 import { ArrowRight, Layers } from "lucide-react";
 import {
   getAllGamesForAdmin,
