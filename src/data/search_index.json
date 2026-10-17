@@ -1,0 +1,116 @@
+[
+  {
+    "slug": "well-dweller",
+    "title_ar": "ساكن البئر",
+    "title_en": "Well Dweller",
+    "cover_url": "/images/covers/well-dweller.jpg"
+  },
+  {
+    "slug": "escape-from-duckov",
+    "title_ar": "الهروب من دوكوف",
+    "title_en": "Escape from Duckov",
+    "cover_url": "/images/covers/escape-from-duckov.png"
+  },
+  {
+    "slug": "silent-hill-townfall",
+    "title_ar": "سايلنت هيل: تاونفول",
+    "title_en": "Silent Hill: Townfall",
+    "cover_url": null
+  },
+  {
+    "slug": "bloodstained-ritual-of-the-night",
+    "title_ar": "بلودستيند: طقس الليل",
+    "title_en": "Bloodstained: Ritual of the Night",
+    "cover_url": "/images/covers/bloodstained.jpg"
+  },
+  {
+    "slug": "echoweaver",
+    "title_ar": "إيكو ويفر: ناسجة الصدى",
+    "title_en": "EchoWeaver",
+    "cover_url": null
+  },
+  {
+    "slug": "backseat",
+    "title_ar": "باكسيت: رحلة المقعد الخلفي",
+    "title_en": "Backseat",
+    "cover_url": null
+  },
+  {
+    "slug": "end-of-abyss",
+    "title_ar": "نهاية الهاوية",
+    "title_en": "End of Abyss",
+    "cover_url": null
+  },
+  {
+    "slug": "the-dressmaker",
+    "title_ar": "صانعة الفساتين",
+    "title_en": "The Dressmaker",
+    "cover_url": null
+  },
+  {
+    "slug": "guacamelee-2",
+    "title_ar": "جواكاميلي! 2",
+    "title_en": "Guacamelee! 2",
+    "cover_url": null
+  },
+  {
+    "slug": "control-resonant",
+    "title_ar": "كنترول: صدى الاضطراب",
+    "title_en": "Control Resonant",
+    "cover_url": null
+  },
+  {
+    "slug": "inside",
+    "title_ar": "إنسايد (داخل)",
+    "title_en": "INSIDE",
+    "cover_url": null
+  },
+  {
+    "slug": "the-seance-of-blake-manor",
+    "title_ar": "جلسة تحضير الأرواح: قصر بليك",
+    "title_en": "The Seance of Blake Manor",
+    "cover_url": null
+  },
+  {
+    "slug": "biogun",
+    "title_ar": "بيو غَن",
+    "title_en": "BioGun",
+    "cover_url": null
+  },
+  {
+    "slug": "welcome-to-elderfield",
+    "title_ar": "مرحباً في إلدر فيلد",
+    "title_en": "Welcome to Elderfield",
+    "cover_url": null
+  },
+  {
+    "slug": "wheelmates",
+    "title_ar": "رفاق العجلات",
+    "title_en": "WheelMates",
+    "cover_url": null
+  },
+  {
+    "slug": "twilight-monk",
+    "title_ar": "راهب الشفق",
+    "title_en": "TWILIGHT MONK",
+    "cover_url": null
+  },
+  {
+    "slug": "mad-father",
+    "title_ar": "الأب المجنون",
+    "title_en": "Mad Father",
+    "cover_url": null
+  },
+  {
+    "slug": "forever-ago",
+    "title_ar": "إلى الأبد مضى",
+    "title_en": "Forever Ago",
+    "cover_url": null
+  },
+  {
+    "slug": "silver-pines",
+    "title_ar": "سيلفر باينز",
+    "title_en": "Silver Pines",
+    "cover_url": null
+  }
+]
