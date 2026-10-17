@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import Container from "@/components/ui/Container.astro";
 import {
-  getAllPublishedGames,
+  getAllGamesForAdmin,
   getGameBySlug,
   getGameVersions,
 } from "@/lib/queries";
@@ -22,39 +22,17 @@ import { GameScreenshots } from "@/components/games/game-screenshots";
 import { DownloadSection } from "@/components/games/download-section";
 import { SupportWidget } from "@/components/games/support-widget";
 import { CommunityRequest } from "@/components/games/community-request";
+import { GameLiveGuard } from "@/components/games/game-live-guard";
 import { getTranslations, type Locale } from "@/lib/i18n";
 import type { Game } from "@/lib/types";
 
 export async function getStaticPaths() {
-  const games = await getAllPublishedGames();
+  const games = await getAllGamesForAdmin();
   const paths: any[] = [];
   const locales: Locale[] = ["ar", "en"];
 
-  // Ensure fallback games exist even if database is empty at build time
-  const fallbackSlugs = ["silent-hill-townfall"];
-  const allGames = [...games];
-
-  for (const s of fallbackSlugs) {
-    if (!allGames.some((g) => g.slug === s)) {
-      allGames.push({
-        id: "demo-" + s,
-        slug: s,
-        title_ar: "سايلنت هيل: تاونفول",
-        title_en: "Silent Hill: Townfall",
-        description_ar: "باتش تعريب لعبة سايلنت هيل: تاونفول بالكامل مع ترجمة الحوارات والقوائم وتعديل الخطوط والرموز.",
-        description_en: "Full Arabic localization patch for Silent Hill: Townfall.",
-        cover_url: "/covers/silent-hill-townfall.jpg",
-        steam_url: "https://store.steampowered.com/app/silent-hill-townfall",
-        published: true,
-        download_count: 1420,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      });
-    }
-  }
-
   for (const locale of locales) {
-    for (const game of allGames) {
+    for (const game of games) {
       paths.push({
         params: { locale, slug: game.slug },
         props: { game },
@@ -68,7 +46,7 @@ const { locale = "ar", slug } = Astro.params as { locale: Locale; slug: string }
 const props = Astro.props as { game?: Game };
 const game = props.game || (await getGameBySlug(slug));
 
-if (!game || game.published === false) {
+if (!game) {
   return Astro.redirect(`/${locale}/games`);
 }
 
@@ -84,6 +62,13 @@ const pageDesc =
 ---
 
 <BaseLayout locale={locale} title={pageTitle} description={pageDesc}>
+  <GameLiveGuard
+    client:load
+    gameId={game.id}
+    slug={game.slug}
+    initialPublished={game.published}
+    locale={locale}
+  >
   <div class="pb-20">
     <!-- =========================================================================
          HERO & GAME INTRO
@@ -242,4 +227,5 @@ const pageDesc =
       <CommunityRequest client:visible />
     </Container>
   </div>
+  </GameLiveGuard>
 </BaseLayout>
